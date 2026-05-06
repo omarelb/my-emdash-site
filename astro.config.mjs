@@ -34,4 +34,9 @@ export default defineConfig({
     },
   ],
   devToolbar: { enabled: false },
+  vite: {
+    ssr: {
+      external: ["better-sqlite3", "kysely"],
+    },
+  },
 });
