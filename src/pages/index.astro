@@ -1,170 +1,580 @@
 ---
-import { getEmDashCollection, getSiteSettings } from "emdash";
+import { getEmDashCollection, getEmDashEntry, getTaxonomyTerms, getEntryTerms } from "emdash";
+import { Image } from "emdash/ui";
 import Base from "../layouts/Base.astro";
-import ProjectCard from "../components/ProjectCard.astro";
 
-// Fetch settings + the 4 featured projects in parallel. Limiting and
-// sorting in the database avoids loading every project just to slice
-// off the first 4 in JS (a full-table read on sites with lots of work).
-const [settings, { entries: featuredProjects, cacheHint }] = await Promise.all([
-	getSiteSettings(),
-	getEmDashCollection("projects", {
-		orderBy: { published_at: "desc" },
-		limit: 4,
-	}),
+const [
+	{ entry: homeSettings },
+	{ entries: allProjects, cacheHint },
+	workTypes,
+] = await Promise.all([
+	getEmDashEntry("home_settings", "home"),
+	getEmDashCollection("projects", { orderBy: { published_at: "desc" } }),
+	getTaxonomyTerms("work_type"),
 ]);
 
 Astro.cache.set(cacheHint);
+
+const heroHeading = homeSettings?.data.hero_heading || "Hello, I'm Josephine.";
+const heroSubheading =
+	homeSettings?.data.hero_subheading ||
+	"An industrial + CMF designer with a mechanical engineering background. I enjoy creating experiences that are fun, meaningful and user-centred.";
+
+const workTypeOrder = ["concept-design", "cmf", "user-research", "3d-rendering", "cad"];
+const sortedWorkTypes = [...workTypes].sort((a, b) => {
+	const ia = workTypeOrder.indexOf(a.slug ?? "");
+	const ib = workTypeOrder.indexOf(b.slug ?? "");
+	return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+});
+
+// Sort all projects by priority desc
+const projectsByPriority = [...allProjects].sort(
+	(a, b) => ((b.data as any).priority ?? 0) - ((a.data as any).priority ?? 0)
+);
+
+// Attach work_type slugs to each project for client-side filtering
+const projectsWithTypes = await Promise.all(
+	projectsByPriority.map(async (p) => {
+		const terms = await getEntryTerms("projects", (p.data as any).id, "work_type").catch(() => [] as any[]);
+		return {
+			project: p,
+			workTypeSlugs: (terms as any[]).map((t) => t.slug).join(","),
+		};
+	})
+);
+
+// Only show work type tags that have at least one project
+const usedWorkTypeSlugs = new Set(
+	projectsWithTypes.flatMap(({ workTypeSlugs }) => workTypeSlugs.split(",").filter(Boolean))
+);
+const filteredWorkTypes = sortedWorkTypes.filter((t) => usedWorkTypeSlugs.has(t.slug ?? ""));
 ---
 
 <Base>
-	<section class="hero">
-		<h1 class="hero-title">{settings?.title || "Studio"}</h1>
-		<p class="hero-tagline">{settings?.tagline || "Design & Development"}</p>
-	</section>
+	<div class="page">
+		<!-- Hero -->
+		<section class="hero">
+			<h1 class="hero-heading">{heroHeading}</h1>
+			<p class="hero-subheading">{heroSubheading}</p>
+			<a href="/about" class="cta-link">
+				Get to Know Me
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M5 12h14M12 5l7 7-7 7"></path>
+				</svg>
+			</a>
+		</section>
 
-	{
-		featuredProjects.length > 0 ? (
-			<section class="featured">
-				<header class="section-header">
-					<h2 class="section-title">Selected Work</h2>
-					<a href="/work" class="section-link">
-						View all projects &rarr;
-					</a>
-				</header>
-				<div class="projects-grid">
-					{featuredProjects.map((project) => (
-						<ProjectCard
-							title={project.data.title ?? "Untitled"}
-							summary={project.data.summary}
-							featuredImage={project.data.featured_image ?? ""}
-							href={`/work/${project.id}`}
-							client={project.data.client}
-							year={project.data.year}
-						/>
-					))}
+		<!-- Work section -->
+		<section class="work-section">
+			<!-- Header row -->
+			<div class="work-header">
+				<span class="work-title">WORK</span>
+				<div class="work-meta">
+					<span class="selected-work-label">Selected Work</span>
+					<span class="work-years">2021–2026</span>
 				</div>
-			</section>
-		) : (
-			<section class="empty-state">
-				<h2>No projects yet</h2>
-				<p>Add your first project in the admin panel.</p>
-				<a href="/_emdash/admin/content/projects/new" class="btn">
-					Add a project
+			</div>
+
+			<!-- Category tags row — clickable filters -->
+			{
+				filteredWorkTypes.length > 0 && (
+					<div class="work-tags" id="work-tags">
+						{filteredWorkTypes.map((term) => (
+							<button class="work-tag" data-slug={term.slug} type="button">
+								{term.label}<span class="work-tag-deselect" aria-hidden="true"> ×</span>
+							</button>
+						))}
+					</div>
+				)
+			}
+
+			<!-- Project banners (all rendered; JS shows top 2 by priority / filter) -->
+			<div class="projects-list" id="projects-list">
+				{
+					projectsWithTypes.length > 0 ? (
+						projectsWithTypes.map(({ project, workTypeSlugs }) => (
+							<a
+								href={`/projects/${project.id}`}
+								class="project-banner-link"
+								data-project-id={project.id}
+								data-priority={(project.data as any).priority ?? 0}
+								data-work-types={workTypeSlugs}
+							>
+								<div class="project-banner">
+									<div class="banner-image-wrap">
+										<Image
+											image={project.data.featured_image}
+											class="banner-img"
+										/>
+										<div class="banner-darken"></div>
+										<div class="banner-center-gradient"></div>
+									</div>
+									<p
+										class="banner-overlay-text"
+										style={`--overlay-color: ${(project.data as any).home_text_light !== false ? "#ffffff" : "#000000"}`}
+									>
+										{(project.data as any).home_overlay_text || project.data.title}
+									</p>
+									<div
+										class="banner-view-project"
+										style={`--overlay-color: ${(project.data as any).home_text_light !== false ? "#ffffff" : "#000000"}`}
+									>
+										View project
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path d="M5 12h14M12 5l7 7-7 7" />
+										</svg>
+									</div>
+								</div>
+							</a>
+						))
+					) : (
+						<p class="no-projects">
+							No projects yet.{" "}
+							<a href="/_emdash/admin/content/projects">Add your first project.</a>
+						</p>
+					)
+				}
+			</div>
+
+			<!-- See more -->
+			<div class="see-more-wrap">
+				<a href="/work" class="see-more-link">
+					See more of my work
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<path d="M5 12h14M12 5l7 7-7 7"></path>
+					</svg>
 				</a>
-			</section>
-		)
-	}
+			</div>
+		</section>
+	</div>
 </Base>
 
+<script>
+	(function () {
+		let activeFilter: string | null = null;
+
+		function applyFilter(slug: string | null) {
+			activeFilter = slug;
+
+			document.querySelectorAll<HTMLElement>(".work-tag").forEach((tag) => {
+				tag.classList.toggle("active", tag.dataset.slug === slug);
+			});
+
+			const links = [...document.querySelectorAll<HTMLElement>(".project-banner-link")];
+
+			let candidates = links.map((el) => ({
+				el,
+				workTypes: (el.dataset.workTypes || "").split(",").filter(Boolean),
+				priority: parseInt(el.dataset.priority || "0", 10),
+			}));
+
+			if (slug) {
+				candidates = candidates.filter((c) => c.workTypes.includes(slug));
+			}
+
+			candidates.sort((a, b) => b.priority - a.priority);
+			const showEls = new Set(candidates.slice(0, 2).map((c) => c.el));
+
+			links.forEach((link) => {
+				link.style.display = showEls.has(link) ? "" : "none";
+			});
+		}
+
+		// Initial state: show top 2 by priority
+		applyFilter(null);
+
+		document.querySelectorAll<HTMLElement>(".work-tag").forEach((tag) => {
+			tag.addEventListener("click", () => {
+				const slug = tag.dataset.slug || null;
+				// Toggle: clicking the active filter deselects it
+				applyFilter(activeFilter === slug ? null : slug);
+			});
+		});
+	})();
+</script>
+
 <style>
+	/* ── Page wrapper ── */
+	.page {
+		padding: 0 var(--page-padding);
+	}
+
+	/* ── Hero ── */
 	.hero {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: var(--spacing-4xl) var(--spacing-lg);
-		text-align: center;
+		padding-top: 240px;
+		margin-bottom: 187px;
 	}
 
-	.hero-title {
-		font-size: var(--font-size-4xl);
-		font-weight: 500;
-		margin-bottom: var(--spacing-md);
-		letter-spacing: -0.02em;
+	.hero-heading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+		margin-bottom: 32px;
+		text-transform: uppercase;
+		font-style: normal;
 	}
 
-	.hero-tagline {
-		font-size: var(--font-size-xl);
-		color: var(--color-muted);
-		font-family: var(--font-serif);
-		font-style: italic;
+	.hero-subheading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1;
+		letter-spacing: 0;
+		margin-bottom: 145px;
+		max-width: 600px;
 	}
 
-	.featured {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: 0 var(--spacing-lg) var(--spacing-4xl);
-	}
-
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		margin-bottom: var(--spacing-2xl);
-		padding-bottom: var(--spacing-md);
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.section-title {
-		font-size: var(--font-size-lg);
-		font-weight: 500;
-	}
-
-	.section-link {
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
+	.cta-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
 		text-decoration: none;
-		transition: color var(--transition-fast);
-	}
-
-	.section-link:hover {
 		color: var(--color-text);
 	}
 
-	.projects-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: var(--spacing-2xl);
+	.cta-link:hover {
+		opacity: 0.7;
 	}
 
-	.empty-state {
-		text-align: center;
-		padding: var(--spacing-4xl) var(--spacing-lg);
-		max-width: 400px;
-		margin: 0 auto;
+	.cta-link:active {
+		opacity: 0.45;
 	}
 
-	.empty-state h2 {
-		font-size: var(--font-size-xl);
-		margin-bottom: var(--spacing-sm);
+	/* ── Work section ── */
+	.work-section {
+		padding-top: 28px;
 	}
 
-	.empty-state p {
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-lg);
+	.work-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 32px;
 	}
 
-	.btn {
-		display: inline-block;
-		padding: var(--spacing-sm) var(--spacing-lg);
-		background: var(--color-text);
-		color: var(--color-bg);
+	.work-title {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.work-meta {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.selected-work-label {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		text-align: right;
+	}
+
+	.work-years {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1;
+		text-align: right;
+	}
+
+	/* ── Category tags ── */
+	.work-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75em 3em;
+		margin-left: calc(var(--page-padding) * -1 - 13px);
+		margin-bottom: 32px;
+	}
+
+	.work-tag {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: #767676;
+		white-space: nowrap;
+		text-transform: uppercase;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		transition: color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+		transform-origin: left center;
+	}
+
+	.work-tag:hover {
+		color: var(--color-text);
+		transform: scale(1.02);
+	}
+
+	.work-tag:active {
+		opacity: 0.45;
+	}
+
+	.work-tag.active {
+		color: var(--color-text);
+		transform: scale(1.02);
+	}
+
+	.work-tag-deselect {
+		font-size: 0.6em;
+		vertical-align: super;
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.work-tag.active:hover .work-tag-deselect {
+		opacity: 0.6;
+	}
+
+	/* ── Project banners ── */
+	.projects-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		margin-left: calc(var(--page-padding) * -1);
+		margin-right: calc(var(--page-padding) * -1);
+		margin-bottom: 50px;
+	}
+
+	.project-banner-link {
+		display: block;
+		margin: 0;
 		text-decoration: none;
-		border-radius: var(--radius);
+	}
+
+	.project-banner {
+		position: relative;
+		height: 785px;
+		overflow: hidden;
+	}
+
+	.banner-image-wrap {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.banner-image-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform var(--transition-slow);
+	}
+
+	/* Gradient overlay so white text is always readable */
+	.banner-darken {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(0, 0, 0, 0.5) 0%,
+			rgba(0, 0, 0, 0.15) 45%,
+			rgba(0, 0, 0, 0) 100%
+		);
+		z-index: 1;
+	}
+
+	/* Concentric radial gradient under the "View project" text — appears on hover */
+	.banner-center-gradient {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0) 80%);
+		opacity: 0;
+		transition: opacity var(--transition-base);
+		z-index: 1;
+	}
+
+	.project-banner-link:hover .banner-center-gradient {
+		opacity: 1;
+	}
+
+	.project-banner-link:hover .banner-image-wrap img {
+		transform: scale(1.04);
+	}
+
+	.banner-overlay-text {
+		position: absolute;
+		top: 16px;
+		left: 20px;
+		max-width: 400px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: var(--overlay-color, #ffffff);
+		white-space: pre-line;
+		z-index: 2;
+	}
+
+	.banner-view-project {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: var(--overlay-color, #ffffff);
+		opacity: 0;
+		transition: opacity var(--transition-base);
+		z-index: 2;
+	}
+
+	.project-banner-link:hover .banner-view-project {
+		opacity: 1;
+	}
+
+	.no-projects {
+		padding: var(--spacing-4xl) var(--page-padding);
+		color: var(--color-muted);
 		font-size: var(--font-size-sm);
-		transition: opacity var(--transition-fast);
 	}
 
-	.btn:hover {
-		opacity: 0.85;
+	.no-projects a {
+		color: var(--color-text);
 	}
 
+	/* ── See more ── */
+	.see-more-wrap {
+		padding-bottom: 80px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.see-more-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-decoration: none;
+		color: var(--color-text);
+	}
+
+	.see-more-link:hover {
+		opacity: 0.7;
+	}
+
+	.see-more-link:active {
+		opacity: 0.45;
+	}
+
+	/* ── Responsive ── */
 	@media (max-width: 768px) {
 		.hero {
-			padding: var(--spacing-3xl) var(--spacing-lg);
+			padding-top: 120px;
+			margin-bottom: 100px;
 		}
 
-		.hero-title {
-			font-size: var(--font-size-3xl);
+		.hero-heading {
+			font-size: 28px;
+			margin-bottom: 24px;
 		}
 
-		.projects-grid {
-			grid-template-columns: 1fr;
+		.hero-subheading {
+			font-size: 15px;
+			margin-bottom: 80px;
 		}
 
-		.section-header {
-			flex-direction: column;
-			gap: var(--spacing-sm);
-			align-items: flex-start;
+		.work-title {
+			font-size: 28px;
+		}
+
+		.work-tags {
+			gap: 0.5em 2.5em;
+			margin-left: calc(var(--page-padding) * -0.3);
+		}
+
+		.work-tag {
+			font-size: 28px;
+		}
+
+		.project-banner {
+			height: 480px;
+		}
+
+		.cta-link,
+		.see-more-link {
+			font-size: 18px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.hero {
+			padding-top: 80px;
+			margin-bottom: 80px;
+		}
+
+		.hero-heading {
+			font-size: 24px;
+		}
+
+		.hero-subheading {
+			margin-bottom: 60px;
+		}
+
+		.work-tag {
+			font-size: 22px;
+		}
+
+		.project-banner {
+			height: 360px;
 		}
 	}
 </style>

@@ -1,217 +1,164 @@
 ---
-export const prerender = false;
-
-import {
-	getEmDashCollection,
-	getTaxonomyTerms,
-	getTermsForEntries,
-} from "emdash";
+import { getEmDashCollection } from "emdash";
+import { Image } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
-import ProjectCard from "../../components/ProjectCard.astro";
 
-// Get filter from query param. When set, push the filter down to the
-// database via `where` instead of loading every project and filtering
-// in JS — that pattern scales O(projects × terms-per-project) and
-// blows up the moment you have more than a couple of dozen entries.
-const activeTag = Astro.url.searchParams.get("tag");
-
-const [{ entries: sortedProjects, cacheHint }, tags] = await Promise.all([
-	getEmDashCollection("projects", {
-		orderBy: { published_at: "desc" },
-		...(activeTag ? { where: { tag: activeTag } } : {}),
-	}),
-	getTaxonomyTerms("tag"),
-]);
+const { entries: projects, cacheHint } = await getEmDashCollection("projects", {
+	orderBy: { published_at: "desc" },
+});
 
 Astro.cache.set(cacheHint);
-
-// Single batched JOIN for the tag pills shown on each card, instead of
-// one getEntryTerms() round-trip per card.
-const tagsByEntry = await getTermsForEntries(
-	"projects",
-	sortedProjects.map((p) => p.data.id),
-	"tag",
-);
-const projectsWithTags = sortedProjects.map((project) => ({
-	project,
-	projectTags: tagsByEntry.get(project.data.id) ?? [],
-}));
 ---
 
-<Base
-	title={activeTag
-		? `${tags.find((t) => t.slug === activeTag)?.label || activeTag} — Work`
-		: "Work"}
->
-	<section class="work-header">
-		<h1>Work</h1>
-		<p class="work-intro">
-			A selection of projects spanning branding, web design, print, and
-			photography.
-		</p>
-
+<Base title="Work">
+	<div class="work-page">
 		{
-			tags.length > 0 && (
-				<nav class="tag-filters" aria-label="Filter by tag">
-					{tags.map((tag) => (
-						<a
-							href={`/work?tag=${tag.slug}`}
-							class:list={["tag-filter", { active: activeTag === tag.slug }]}
-						>
-							{tag.label}
+			projects.length > 0 ? (
+				<div class="masonry-grid" id="masonry-grid">
+					{projects.map((project) => (
+						<a href={`/projects/${project.id}`} class="work-card">
+							<div class="card-image-wrap">
+								<Image
+									image={project.data.featured_image}
+									class="card-img"
+								/>
+							</div>
+							<div class="card-info">
+								<p class="card-title">
+									{(project.data.title ?? "").toUpperCase()}
+								</p>
+								{project.data.work_caption && (
+									<p class="card-subtitle">{project.data.work_caption}</p>
+								)}
+							</div>
 						</a>
-					))}
-					{activeTag && (
-						<a href="/work" class="tag-clear" aria-label="Clear filter">
-							Clear
-						</a>
-					)}
-				</nav>
-			)
-		}
-	</section>
-
-	{
-		projectsWithTags.length > 0 ? (
-			<section class="projects">
-				<div class="projects-grid">
-					{projectsWithTags.map(({ project, projectTags }) => (
-						<ProjectCard
-							title={project.data.title ?? "Untitled"}
-							summary={project.data.summary}
-							featuredImage={project.data.featured_image ?? ""}
-							href={`/work/${project.id}`}
-							client={project.data.client}
-							year={project.data.year}
-							tags={projectTags.map((t) => t.label)}
-						/>
 					))}
 				</div>
-			</section>
-		) : (
-			<section class="empty-state">
-				{activeTag ? (
-					<>
-						<p>No projects found with this tag.</p>
-						<a href="/work" class="btn">
-							View all projects
-						</a>
-					</>
-				) : (
-					<>
-						<p>No projects yet. Add your first project in the admin panel.</p>
-						<a href="/_emdash/admin/content/projects/new" class="btn">
-							Add a project
-						</a>
-					</>
-				)}
-			</section>
-		)
-	}
+			) : (
+				<p class="empty">
+					No projects yet.{" "}
+					<a href="/_emdash/admin/content/projects/new">Add your first project.</a>
+				</p>
+			)
+		}
+	</div>
 </Base>
 
+<script>
+	// Cursor-parallax: image shifts subtly toward cursor giving a depth effect
+	document.querySelectorAll<HTMLElement>(".work-card").forEach((card) => {
+		const wrap = card.querySelector<HTMLElement>(".card-image-wrap");
+		const img = card.querySelector<HTMLImageElement>("img");
+		if (!wrap || !img) return;
+
+		const SCALE = 1.08;
+		const TRAVEL = 14;
+		let raf = 0;
+
+		wrap.addEventListener("mouseenter", () => {
+			img.style.transition = "transform 0.15s ease";
+			img.style.transform = `scale(${SCALE})`;
+		});
+
+		wrap.addEventListener("mousemove", (e: MouseEvent) => {
+			cancelAnimationFrame(raf);
+			raf = requestAnimationFrame(() => {
+				const rect = wrap.getBoundingClientRect();
+				const x = (e.clientX - rect.left) / rect.width - 0.5;
+				const y = (e.clientY - rect.top) / rect.height - 0.5;
+				img.style.transition = "transform 0.08s linear";
+				img.style.transform = `scale(${SCALE}) translate(${x * TRAVEL}px, ${y * TRAVEL}px)`;
+			});
+		});
+
+		wrap.addEventListener("mouseleave", () => {
+			cancelAnimationFrame(raf);
+			img.style.transition = "transform 0.5s ease";
+			img.style.transform = "scale(1) translate(0, 0)";
+		});
+	});
+</script>
+
 <style>
-	.work-header {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: var(--spacing-3xl) var(--spacing-lg) var(--spacing-2xl);
+	.work-page {
+		padding: 30px var(--page-padding) 0;
 	}
 
-	.work-header h1 {
-		font-size: var(--font-size-3xl);
-		margin-bottom: var(--spacing-md);
+	/* CSS masonry-like two-column layout via CSS columns */
+	.masonry-grid {
+		columns: 2;
+		column-gap: 20px;
 	}
 
-	.work-intro {
-		font-size: var(--font-size-lg);
-		color: var(--color-muted);
-		max-width: 600px;
-	}
-
-	.tag-filters {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-sm);
-		margin-top: var(--spacing-xl);
-	}
-
-	.tag-filter {
-		display: inline-block;
-		padding: var(--spacing-xs) var(--spacing-md);
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
+	.work-card {
+		display: block;
 		text-decoration: none;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius);
-		transition:
-			color var(--transition-fast),
-			border-color var(--transition-fast),
-			background var(--transition-fast);
-	}
-
-	.tag-filter:hover {
 		color: var(--color-text);
-		border-color: var(--color-text);
+		break-inside: avoid;
+		margin-bottom: 20px;
 	}
 
-	.tag-filter.active {
-		color: var(--color-bg);
-		background: var(--color-text);
-		border-color: var(--color-text);
+	/* Clip parallax movement */
+	.card-image-wrap {
+		overflow: hidden;
+		width: 100%;
 	}
 
-	.tag-clear {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--spacing-xs);
-		padding: var(--spacing-xs) var(--spacing-md);
-		font-size: var(--font-size-sm);
+	.card-image-wrap img {
+		width: 100%;
+		height: auto;
+		display: block;
+		transform-origin: center center;
+		will-change: transform;
+	}
+
+	.card-info {
+		padding: 6px 0 16px;
+	}
+
+	.card-title {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.card-subtitle {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 13px;
+		line-height: 1;
+		color: #767676;
+		margin-top: 4px;
+	}
+
+	.empty {
+		padding: 80px 0;
 		color: var(--color-muted);
-		text-decoration: none;
-		transition: color var(--transition-fast);
+		font-size: var(--font-size-sm);
 	}
 
-	.tag-clear:hover {
+	.empty a {
 		color: var(--color-text);
 	}
 
-	.tag-clear::before {
-		content: "×";
-		font-size: 1.1em;
+	.work-card:hover .card-title {
+		text-decoration: underline;
 	}
 
-	.projects {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: 0 var(--spacing-lg) var(--spacing-4xl);
+	.work-card:hover .card-subtitle {
+		text-decoration: underline;
+		color: var(--color-text);
 	}
 
-	.projects-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: var(--spacing-2xl);
+	.work-card:active {
+		opacity: 0.8;
 	}
 
-	.empty-state {
-		text-align: center;
-		padding: var(--spacing-4xl) var(--spacing-lg);
-		color: var(--color-muted);
-	}
-
-	.btn {
-		display: inline-block;
-		margin-top: var(--spacing-lg);
-		padding: var(--spacing-sm) var(--spacing-lg);
-		background: var(--color-text);
-		color: var(--color-bg);
-		text-decoration: none;
-		border-radius: var(--radius);
-		font-size: var(--font-size-sm);
-	}
-
-	@media (max-width: 768px) {
-		.projects-grid {
-			grid-template-columns: 1fr;
+	@media (max-width: 640px) {
+		.masonry-grid {
+			columns: 1;
 		}
 	}
 </style>

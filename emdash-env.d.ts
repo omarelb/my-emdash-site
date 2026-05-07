@@ -5,12 +5,32 @@
 
 import type { ContentBylineCredit, PortableTextBlock } from "emdash";
 
+export interface HomePageSettings {
+  id: string;
+  slug: string | null;
+  status: string;
+  hero_heading?: string;
+  hero_subheading?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  bylines?: ContentBylineCredit[];
+}
+
 export interface Page {
   id: string;
   slug: string | null;
   status: string;
   title: string;
   content?: PortableTextBlock[];
+  page_image?: {
+    id: string;
+    src?: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  };
+  cv_url?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -22,13 +42,36 @@ export interface Project {
   slug: string | null;
   status: string;
   title: string;
-  featured_image: { id: string; src?: string; alt?: string; width?: number; height?: number };
-  client?: string;
+  featured_image: {
+    id: string;
+    src?: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  };
   year?: string;
   summary?: string;
   content?: PortableTextBlock[];
   gallery?: unknown;
   url?: string;
+  work_caption?: string;
+  client?: string;
+  team?: string;
+  role?: string;
+  design_tools?: string;
+  description?: string;
+  project_tagline?: string;
+  design_brief?: string;
+  project_secondary_image?: {
+    id: string;
+    src?: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  };
+  priority?: number;
+  home_overlay_text?: string;
+  home_text_light?: boolean;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -37,6 +80,7 @@ export interface Project {
 
 declare module "emdash" {
   interface EmDashCollections {
+    home_settings: HomePageSettings;
     pages: Page;
     projects: Project;
   }

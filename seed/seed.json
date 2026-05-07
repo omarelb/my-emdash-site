@@ -12,10 +12,38 @@
 	},
 	"collections": [
 		{
+			"slug": "home_settings",
+			"label": "Home Page Settings",
+			"labelSingular": "Home Page Settings",
+			"supports": [],
+			"fields": [
+				{
+					"slug": "site_name",
+					"label": "Site Name (shown in header)",
+					"type": "string"
+				},
+				{
+					"slug": "hero_heading",
+					"label": "Hero Heading",
+					"type": "string"
+				},
+				{
+					"slug": "hero_subheading",
+					"label": "Hero Subheading",
+					"type": "text"
+				}
+			]
+		},
+		{
 			"slug": "projects",
 			"label": "Projects",
 			"labelSingular": "Project",
-			"supports": ["drafts", "revisions", "search", "seo"],
+			"supports": [
+				"drafts",
+				"revisions",
+				"search",
+				"seo"
+			],
 			"fields": [
 				{
 					"slug": "title",
@@ -36,6 +64,57 @@
 					"type": "string"
 				},
 				{
+					"slug": "team",
+					"label": "Team",
+					"type": "string"
+				},
+				{
+					"slug": "role",
+					"label": "Role",
+					"type": "string"
+				},
+				{
+					"slug": "design_tools",
+					"label": "Design Tools",
+					"type": "string"
+				},
+				{
+					"slug": "description",
+					"label": "Project Description",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "project_tagline",
+					"label": "Project Tagline",
+					"type": "string"
+				},
+				{
+					"slug": "design_brief",
+					"label": "Design Brief",
+					"type": "text"
+				},
+				{
+					"slug": "project_secondary_image",
+					"label": "Secondary Image",
+					"type": "image"
+				},
+				{
+					"slug": "priority",
+					"label": "Priority (higher = shown first on home page)",
+					"type": "integer"
+				},
+				{
+					"slug": "home_overlay_text",
+					"label": "Home Page Overlay Text",
+					"type": "text"
+				},
+				{
+					"slug": "home_text_light",
+					"label": "Use Light Text on Home Image",
+					"type": "boolean"
+				},
+				{
 					"slug": "year",
 					"label": "Year",
 					"type": "string"
@@ -53,6 +132,11 @@
 					"searchable": true
 				},
 				{
+					"slug": "work_caption",
+					"label": "Work Grid Caption",
+					"type": "string"
+				},
+				{
 					"slug": "gallery",
 					"label": "Gallery",
 					"type": "json"
@@ -68,7 +152,11 @@
 			"slug": "pages",
 			"label": "Pages",
 			"labelSingular": "Page",
-			"supports": ["drafts", "revisions", "search"],
+			"supports": [
+				"drafts",
+				"revisions",
+				"search"
+			],
 			"fields": [
 				{
 					"slug": "title",
@@ -82,6 +170,16 @@
 					"label": "Content",
 					"type": "portableText",
 					"searchable": true
+				},
+				{
+					"slug": "page_image",
+					"label": "Page Image",
+					"type": "image"
+				},
+				{
+					"slug": "cv_url",
+					"label": "CV / Resume (URL to PDF)",
+					"type": "string"
 				}
 			]
 		}
@@ -92,7 +190,9 @@
 			"label": "Categories",
 			"labelSingular": "Category",
 			"hierarchical": false,
-			"collections": ["projects"],
+			"collections": [
+				"projects"
+			],
 			"terms": [
 				{
 					"slug": "branding",
@@ -117,7 +217,9 @@
 			"label": "Tags",
 			"labelSingular": "Tag",
 			"hierarchical": false,
-			"collections": ["projects"],
+			"collections": [
+				"projects"
+			],
 			"terms": [
 				{
 					"slug": "identity",
@@ -148,6 +250,37 @@
 					"label": "Editorial"
 				}
 			]
+		},
+		{
+			"name": "work_type",
+			"label": "Work Types",
+			"labelSingular": "Work Type",
+			"hierarchical": false,
+			"collections": [
+				"projects"
+			],
+			"terms": [
+				{
+					"slug": "concept-design",
+					"label": "Concept Design"
+				},
+				{
+					"slug": "cmf",
+					"label": "CMF"
+				},
+				{
+					"slug": "user-research",
+					"label": "User Research"
+				},
+				{
+					"slug": "3d-rendering",
+					"label": "3D Rendering"
+				},
+				{
+					"slug": "cad",
+					"label": "CAD"
+				}
+			]
 		}
 	],
 	"menus": [
@@ -155,6 +288,16 @@
 			"name": "primary",
 			"label": "Primary Navigation",
 			"items": [
+				{
+					"type": "custom",
+					"label": "Home",
+					"url": "/"
+				},
+				{
+					"type": "custom",
+					"label": "About",
+					"url": "/about"
+				},
 				{
 					"type": "custom",
 					"label": "Work",
@@ -169,67 +312,179 @@
 		}
 	],
 	"content": {
+		"home_settings": [
+			{
+				"id": "home",
+				"slug": "home",
+				"status": "published",
+				"data": {
+					"site_name": "Josephine Leong",
+					"hero_heading": "Hello, I'm Josephine.",
+					"hero_subheading": "An industrial + CMF designer with a mechanical engineering background. I enjoy creating experiences that are fun, meaningful and user-centred."
+				}
+			}
+		],
 		"pages": [
 			{
 				"id": "about",
 				"slug": "about",
 				"status": "published",
 				"data": {
-					"title": "About",
+					"title": "Hello again.",
 					"content": [
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "a0",
 							"children": [
 								{
 									"_type": "span",
-									"text": "We are a small design studio focused on creating meaningful work for thoughtful clients. Founded in 2020, we've had the privilege of working with brands across technology, culture, and the arts.",
-									"_key": "k1"
+									"_key": "a1",
+									"text": "I'm Josephine, an industrial and CMF designer with a mechanical engineering background based in the Netherlands. I believe great design lives at the intersection of function, material, and meaning."
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "a2",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Our approach is simple: listen carefully, think deeply, and craft with intention. We believe that good design is invisible — it gets out of the way and lets the work speak for itself.",
-									"_key": "k3"
+									"_key": "a3",
+									"text": "My work spans concept design, CMF strategy, user research, and 3D visualisation. I enjoy working on projects where the physical and experiential qualities of a product are just as important as its technical performance."
 								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "What we do",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "a4",
 							"children": [
 								{
 									"_type": "span",
-									"text": "We specialize in brand identity, web design, and art direction. Whether you need a complete visual identity or a single website, we bring the same level of care and attention to every project.",
-									"_key": "k7"
+									"_key": "a5",
+									"text": "Previously I've worked on urban furniture, consumer electronics, and sustainable mobility. I'm currently open to new opportunities \u2014 feel free to reach out."
 								}
-							],
-							"_key": "k6"
+							]
 						}
-					]
+					],
+					"page_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop",
+							"alt": "Josephine Leong, designer",
+							"filename": "about-photo.jpg"
+						}
+					},
+					"cv_url": ""
 				}
 			}
 		],
 		"projects": [
+			{
+				"id": "energy-tree",
+				"slug": "energy-tree",
+				"status": "published",
+				"data": {
+					"title": "Energy Tree",
+					"client": "Municipality of Dordrecht",
+					"year": "2024",
+					"work_caption": "Urban furniture concept for the 2030 energy transition",
+					"team": "Josephine Leong",
+					"role": "Concept & CMF Designer",
+					"design_tools": "Figma, Rhino, KeyShot",
+					"summary": "Urban furniture concept designed to make the 2030 energy transition visible and participatory for citizens of Dordrecht.",
+					"description": "Energy Tree is a solar-powered urban furniture concept that turns passive street infrastructure into an active touchpoint in Dordrecht\u2019s sustainability story. Positioned at key pedestrian intersections, each unit harvests solar energy through an overhead canopy of photovoltaic panels shaped to evoke a tree canopy. USB charging ports and ambient LED lighting make the benefits of renewable energy immediately tangible to passersby, while a small display shows real-time energy generation data. The CMF strategy pairs powder-coated COR-TEN steel with recycled-content polycarbonate diffusers, giving the piece a warm, civic character that ages gracefully in a public setting.",
+					"project_tagline": "ENERGY TREE \u2014 URBAN FURNITURE CONCEPT \u2014 ENCOURAGING BEHAVIOUR CHANGE TOWARDS A GREENER LIFESTYLE",
+					"design_brief": "The Municipality of Dordrecht commissioned a concept for urban furniture that would make the 2030 energy transition legible and engaging at street level. The brief called for a piece that generates renewable energy, provides a public amenity, and opens a conversation about sustainable urban living \u2014 without resorting to didactic signage or green-washing aesthetics. The design needed to integrate into the existing streetscape language while standing out enough to invite curiosity.",
+					"priority": 10,
+					"home_overlay_text": "ENERGY TREE\nUrban furniture concept design to promote the 2030 energy transition in Dordrecht",
+					"home_text_light": true,
+					"featured_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&fit=crop",
+							"alt": "Energy Tree concept",
+							"filename": "energy-tree-hero.jpg"
+						}
+					},
+					"project_secondary_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1200&h=800&fit=crop",
+							"alt": "Energy Tree detail",
+							"filename": "energy-tree-secondary.jpg"
+						}
+					},
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "et0",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et1",
+									"text": "The starting point was a simple question: what does the energy transition feel like at human scale? Most sustainability infrastructure \u2014 wind turbines, solar farms \u2014 operates at a distance from everyday life. Energy Tree was designed to close that gap."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "et2",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et3",
+									"text": "Research & Context"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "et4",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et5",
+									"text": "Field research in Dordrecht revealed that residents understood the importance of the energy transition intellectually but felt disconnected from its progress. Interviews surfaced a consistent theme: people wanted to see and feel a contribution, not just read about targets. This shaped the core design principle \u2014 make energy generation immediate and personal."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "et6",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et7",
+									"text": "CMF & Detail"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "et8",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et9",
+									"text": "The canopy structure uses a modular array of bifacial solar cells mounted in polycarbonate housings. COR-TEN steel was chosen for the primary structure for its self-healing patina \u2014 a material that visibly ages alongside the city. At night, harvested energy powers warm-white ambient lighting beneath the canopy, transforming the piece into a quiet lantern."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"work_type": [
+						"concept-design",
+						"cmf",
+						"3d-rendering"
+					]
+				}
+			},
 			{
 				"id": "meridian-brand",
 				"slug": "meridian-brand",
@@ -238,10 +493,27 @@
 					"title": "Meridian",
 					"client": "Meridian Collective",
 					"year": "2024",
-					"summary": "A complete brand identity for a creative collective bringing together artists and technologists.",
+					"summary": "Complete visual identity system for Meridian Collective, a platform bridging contemporary art and emerging technology.",
+					"work_caption": "Brand identity for a creative collective",
+					"team": "Josephine Leong, Alex Kim",
+					"role": "Brand Designer",
+					"design_tools": "Figma, Illustrator",
+					"description": "Meridian Collective brings together artists and technologists for collaborative residencies and public programmes. The identity needed to hold two worlds in tension: the slow, material quality of studio practice and the fast, networked logic of digital culture. The solution centres on a custom wordmark where classical proportions meet a subtle optical illusion \u2014 the letterforms read differently depending on viewing distance, a metaphor for the Collective\u2019s dual audience. A restricted palette of warm off-white, deep ink, and a single iridescent accent carries across print, screen, and spatial applications.",
+					"project_tagline": "MERIDIAN \u2014 WHERE STUDIO PRACTICE MEETS DIGITAL CULTURE \u2014 AN IDENTITY IN TWO REGISTERS",
+					"design_brief": "Meridian Collective needed a visual identity flexible enough to live across gallery invitations, Instagram grids, exhibition catalogues, and digital interfaces \u2014 without feeling like it belonged to only one of those contexts. The brief specified no illustrative elements: typography and colour alone had to do all the work. The identity also needed to scale gracefully from a business card to a 6-metre exhibition banner.",
+					"project_secondary_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=800&fit=crop",
+							"alt": "Meridian brand applications",
+							"filename": "meridian-secondary.jpg"
+						}
+					},
+					"priority": 5,
+					"home_overlay_text": "MERIDIAN\nBrand identity for a creative collective bringing together artists and technologists.",
+					"home_text_light": true,
 					"featured_image": {
 						"$media": {
-							"url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=900&fit=crop",
+							"url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=1100&fit=crop",
 							"alt": "Meridian cover image",
 							"filename": "photo-1558618666-fcd25c85cd64.jpg"
 						}
@@ -250,68 +522,76 @@
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "mb0",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Meridian Collective needed a visual identity that could bridge the gap between traditional art and emerging technology. The challenge was to create something that felt timeless yet forward-looking.",
-									"_key": "k1"
+									"_key": "mb1",
+									"text": "The Meridian brief arrived with a mood board that contained no images \u2014 only words. \u201cTimeless but not nostalgic. Digital but not cold. Collective but with a distinct voice.\u201d That tension became the brief."
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "h2",
+							"_key": "mb2",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The approach",
-									"_key": "k3"
+									"_key": "mb3",
+									"text": "Wordmark Development"
 								}
-							],
-							"_key": "k2"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "mb4",
 							"children": [
 								{
 									"_type": "span",
-									"text": "We developed a wordmark that combines classical typography with subtle geometric forms. The color palette draws from both digital interfaces and natural materials, creating a bridge between worlds.",
-									"_key": "k5"
+									"_key": "mb5",
+									"text": "Over thirty wordmark explorations were reduced to three directions: a geometric sans, a modified classical serif, and a hybrid that drew from both. The hybrid won \u2014 its slightly flared terminals give warmth at small sizes while the strict cap-height geometry maintains authority at large scale."
 								}
-							],
-							"_key": "k4"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "h2",
+							"_key": "mb6",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The result",
-									"_key": "k7"
+									"_key": "mb7",
+									"text": "Colour & Application"
 								}
-							],
-							"_key": "k6"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "mb8",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The new identity has been applied across print and digital touchpoints, from business cards to a fully responsive website. Meridian has received positive feedback from both artists and technologists alike.",
-									"_key": "k9"
+									"_key": "mb9",
+									"text": "The iridescent accent \u2014 a foil in print, a CSS gradient on screen \u2014 appears only on the most significant touchpoints: the cover of the annual programme, the header of the website, the stamp on exhibition collateral. Restraint makes each appearance feel deliberate."
 								}
-							],
-							"_key": "k8"
+							]
 						}
 					]
 				},
 				"taxonomies": {
-					"category": ["branding"],
-					"tag": ["identity", "art-direction"]
+					"category": [
+						"branding"
+					],
+					"tag": [
+						"identity",
+						"art-direction"
+					],
+					"work_type": [
+						"concept-design"
+					]
 				}
 			},
 			{
@@ -322,10 +602,27 @@
 					"title": "Volta",
 					"client": "Volta Energy",
 					"year": "2024",
-					"summary": "Website design for a renewable energy startup making clean power accessible to everyone.",
+					"summary": "Website design and UX for Volta Energy, making residential solar accessible through clarity, trust, and a streamlined quote journey.",
+					"work_caption": "Website design for a renewable energy startup",
+					"team": "Josephine Leong",
+					"role": "UX & Visual Designer",
+					"design_tools": "Figma, Webflow",
+					"description": "Volta Energy\u2019s existing website buried the most important action \u2014 getting a quote \u2014 behind four pages of technical content. The redesign inverted that logic: the quote journey begins on the homepage, with educational content available as a secondary path for visitors who want to understand before they commit. A warm green and natural stone palette replaced the previous corporate blues, positioning Volta as a trusted neighbourhood company rather than a faceless utility. Every page was tested with first-time solar buyers to ensure the language stayed human.",
+					"project_tagline": "VOLTA \u2014 MAKING CLEAN ENERGY FEEL LIKE AN OBVIOUS CHOICE \u2014 DESIGN FOR TRUST AT SCALE",
+					"design_brief": "Volta Energy had strong technology and competitive pricing but a website that its own sales team described as \u201ctoo engineering-focused.\u201d The brief asked for a redesign that would reduce the average time-to-quote from 6 minutes to under 2, increase conversion on mobile (where 68% of traffic arrived), and establish Volta as the most approachable brand in the Dutch residential solar market.",
+					"project_secondary_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1200&h=800&fit=crop",
+							"alt": "Volta website on screen",
+							"filename": "volta-secondary.jpg"
+						}
+					},
+					"priority": 4,
+					"home_overlay_text": "VOLTA\nWebsite design for a renewable energy startup making clean power accessible to everyone.",
+					"home_text_light": true,
 					"featured_image": {
 						"$media": {
-							"url": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=900&fit=crop",
+							"url": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=500&fit=crop",
 							"alt": "Volta cover image",
 							"filename": "photo-1497366216548-37526070297c.jpg"
 						}
@@ -335,44 +632,77 @@
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "vw0",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Volta is on a mission to make renewable energy accessible to everyone. They needed a website that could explain complex technology simply while inspiring trust in potential customers.",
-									"_key": "k1"
+									"_key": "vw1",
+									"text": "The first research session revealed the core problem: visitors arrived motivated but left confused. The existing site answered questions nobody had asked while leaving the obvious ones \u2014 \u201cHow much will it cost?\u201d and \u201cHow long does installation take?\u201d \u2014 buried in an FAQ accordion."
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "h2",
+							"_key": "vw2",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Design principles",
-									"_key": "k3"
+									"_key": "vw3",
+									"text": "UX Strategy"
 								}
-							],
-							"_key": "k2"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "vw4",
 							"children": [
 								{
 									"_type": "span",
-									"text": "We focused on clarity and warmth. The design uses generous whitespace and a vibrant green accent that evokes growth and sustainability without feeling clichéd.",
-									"_key": "k5"
+									"_key": "vw5",
+									"text": "We mapped every question a first-time buyer has across a six-week consideration journey and structured the site architecture around those questions in chronological order. The homepage speaks to day-one curiosity. Product pages speak to week-two comparison. The quote flow speaks to week-six readiness."
 								}
-							],
-							"_key": "k4"
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "vw6",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "vw7",
+									"text": "Visual Language"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "vw8",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "vw9",
+									"text": "The green accent was derived from the specific wavelength of light that chlorophyll absorbs most efficiently \u2014 a nerdy detail that nobody notices consciously but that gives the colour an unusual naturalness. Paired with warm greige backgrounds and generous whitespace, it reads as calm and confident rather than aggressively ecological."
+								}
+							]
 						}
 					]
 				},
 				"taxonomies": {
-					"category": ["web"],
-					"tag": ["ui-ux", "development"]
+					"category": [
+						"web"
+					],
+					"tag": [
+						"ui-ux",
+						"development"
+					],
+					"work_type": [
+						"user-research",
+						"concept-design"
+					]
 				}
 			},
 			{
@@ -383,10 +713,24 @@
 					"title": "The Archive",
 					"client": "City Museum",
 					"year": "2023",
-					"summary": "Exhibition catalog and print materials for a retrospective on modernist architecture.",
+					"summary": "Print identity for The Archive \u2014 a 240-page exhibition catalogue and complete wayfinding system for a retrospective on 50 years of modernist architecture.",
+					"work_caption": "Exhibition catalog and print materials",
+					"team": "Josephine Leong, Maria Santos",
+					"role": "Print & Editorial Designer",
+					"design_tools": "InDesign, Illustrator",
+					"description": "The Archive retrospective brought together 200 works spanning five decades of modernist architecture from across Europe. The print identity had to honour the rigour of the subject without becoming a pastiche of mid-century graphic design. The catalogue uses a 12-column grid derived directly from the proportional system used by the exhibition\u2019s most represented architect, Aldo van Eyck. Full-bleed archival photographs alternate with dense analytical spreads, creating a rhythm that mirrors the experience of moving through the exhibition itself. The typeface pairing \u2014 a narrow grotesque for body text and a wide-tracked geometric for headings \u2014 evokes technical drawing conventions without literal mimicry.",
+					"project_tagline": "THE ARCHIVE \u2014 FIVE DECADES OF MODERNIST ARCHITECTURE \u2014 A RETROSPECTIVE IN PRINT",
+					"design_brief": "The City Museum required a complete print identity for The Archive: a 240-page hardcover catalogue, exhibition posters in three sizes, room-by-room wayfinding, and an accompanying zine for younger visitors. The catalogue needed to function both as an academic reference and as a desirable object in the museum shop. Budget constraints meant two-colour printing throughout, with the cover as the only four-colour exception.",
+					"project_secondary_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=800&fit=crop",
+							"alt": "The Archive catalog spread",
+							"filename": "archive-secondary.jpg"
+						}
+					},
 					"featured_image": {
 						"$media": {
-							"url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=900&fit=crop",
+							"url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1000&fit=crop",
 							"alt": "The Archive cover image",
 							"filename": "photo-1507003211169-0a1dd7228f2d.jpg"
 						}
@@ -395,44 +739,77 @@
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "ap0",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The Archive was a major exhibition at the City Museum, showcasing 50 years of modernist architecture through photographs, drawings, and models. We designed the complete print identity.",
-									"_key": "k1"
+									"_key": "ap1",
+									"text": "Two-colour printing is not a limitation \u2014 it is a discipline. Every decision about what gets the second colour becomes a hierarchy decision. For The Archive, the second colour (a warm terracotta Pantone) was reserved for captions, section markers, and the architectural drawings. This single rule gave the entire catalogue its visual logic."
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "h2",
+							"_key": "ap2",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The catalog",
-									"_key": "k3"
+									"_key": "ap3",
+									"text": "Grid System"
 								}
-							],
-							"_key": "k2"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "ap4",
 							"children": [
 								{
 									"_type": "span",
-									"text": "The 240-page catalog uses a strict grid system inspired by the work being exhibited. Full-bleed photography alternates with dense text spreads, creating a rhythm that echoes the exhibition layout.",
-									"_key": "k5"
+									"_key": "ap5",
+									"text": "The 12-column grid accommodates three distinct page types: full-bleed image spreads, 50/50 image-text splits, and dense text pages with marginal annotations. Transitions between types were choreographed across the catalogue like chapters in a film edit \u2014 breathing room before density, density before revelation."
 								}
-							],
-							"_key": "k4"
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "ap6",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ap7",
+									"text": "Wayfinding"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "ap8",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ap9",
+									"text": "The exhibition wayfinding uses the same grid and typefaces as the catalogue, creating a visual continuity between the physical space and the printed object. Visitors who picked up the catalogue first could navigate the rooms with it; visitors who experienced the rooms first found the catalogue a familiar extension."
+								}
+							]
 						}
-					]
+					],
+					"priority": 3
 				},
 				"taxonomies": {
-					"category": ["print"],
-					"tag": ["editorial", "art-direction"]
+					"category": [
+						"print"
+					],
+					"tag": [
+						"editorial",
+						"art-direction"
+					],
+					"work_type": [
+						"concept-design"
+					]
 				}
 			},
 			{
@@ -443,10 +820,23 @@
 					"title": "Coastal",
 					"client": "Personal Project",
 					"year": "2023",
-					"summary": "A photographic study of the Pacific coastline, exploring the intersection of land, sea, and sky.",
+					"summary": "A year-long medium-format film series documenting the Pacific coastline at transitional light \u2014 dawn, dusk, and the hours in between.",
+					"work_caption": "Photographic study of the Pacific coastline",
+					"role": "Photographer",
+					"design_tools": "Mamiya 645, Lightroom",
+					"description": "Coastal began as a single weekend on the Oregon coast with a borrowed Mamiya 645 and ended twelve months later with 340 developed rolls and a shortlist of 48 images. The series is organised not by geography but by light condition: the blue hour before dawn, the hard side-light of morning, the flat midday diffusion, the golden collapse of late afternoon, and the long blue shadow of dusk. Within each condition, the Pacific reveals a different character \u2014 the same stretch of beach becomes five different places across a single day. The prints are made on a warm-tone fibre paper that holds shadow detail without sacrificing the luminosity of the horizon.",
+					"project_tagline": "COASTAL \u2014 A YEAR OF LIGHT ON THE PACIFIC EDGE \u2014 MEDIUM FORMAT FILM 2022\u20132023",
+					"design_brief": "A self-initiated project with no client brief, which meant the brief had to be written retroactively from the work itself. After the first month of shooting it became clear that the project was not about the coast as a place but about the quality of attention that slow photography demands. The constraint: only shoot during the transitional hours. No midday frames. No artificial light. Every image had to be earned by being present at the right moment.",
+					"project_secondary_image": {
+						"$media": {
+							"url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=800&fit=crop",
+							"alt": "Coastal photograph detail",
+							"filename": "coastal-secondary.jpg"
+						}
+					},
 					"featured_image": {
 						"$media": {
-							"url": "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&h=900&fit=crop",
+							"url": "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=600&fit=crop",
 							"alt": "Coastal cover image",
 							"filename": "photo-1505142468610-359e7d316be0.jpg"
 						}
@@ -455,44 +845,78 @@
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "cp0",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Coastal began as a weekend project and grew into a year-long exploration of the Pacific shoreline. Shot entirely on medium format film, the series captures the quiet drama of the coast.",
-									"_key": "k1"
+									"_key": "cp1",
+									"text": "Film slows you down in a way that nothing else does. You have 15 frames per roll, you know exactly how many you have left, and each one costs money and time to develop. That economy of attention changes how you see \u2014 or rather, it restores a kind of seeing that digital abundance has quietly eroded."
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "h2",
+							"_key": "cp2",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Process",
-									"_key": "k3"
+									"_key": "cp3",
+									"text": "Process"
 								}
-							],
-							"_key": "k2"
+							]
 						},
 						{
 							"_type": "block",
 							"style": "normal",
+							"_key": "cp4",
 							"children": [
 								{
 									"_type": "span",
-									"text": "Each image was made at dawn or dusk, when the light is softest and the beaches are empty. The slow process of shooting film encourages patience and intentionality — qualities that show in the final work.",
-									"_key": "k5"
+									"_key": "cp5",
+									"text": "Each location was visited at least three times before any frames were exposed: once to understand the light, once to understand the tides, once to understand the people. By the time the camera came out, the image already existed \u2014 the shutter release was almost an afterthought."
 								}
-							],
-							"_key": "k4"
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "cp6",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "cp7",
+									"text": "Editing & Sequencing"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "cp8",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "cp9",
+									"text": "The final sequence of 48 images was arrived at through six rounds of editing over four months. Images that were technically strong but emotionally neutral were cut. Images that were technically imperfect but held something \u2014 a quality of stillness, a particular quality of grey \u2014 stayed. The final sequence moves from dark to light and back to dark, a single day distilled from a year."
+								}
+							]
 						}
-					]
+					],
+					"priority": 2
 				},
 				"taxonomies": {
-					"category": ["photography"],
-					"tag": ["art-direction", "editorial"]
+					"category": [
+						"photography"
+					],
+					"tag": [
+						"art-direction",
+						"editorial"
+					],
+					"work_type": [
+						"concept-design",
+						"cmf"
+					]
 				}
 			}
 		]

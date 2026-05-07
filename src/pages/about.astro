@@ -1,172 +1,163 @@
 ---
 import { getEmDashEntry } from "emdash";
-import { PortableText } from "emdash/ui";
+import { Image, PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 
 const { entry: page, cacheHint } = await getEmDashEntry("pages", "about");
+if (!page) return Astro.redirect("/");
 
 Astro.cache.set(cacheHint);
+
+const cvUrl = (page.data.cv_url as string | undefined) || "";
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop";
 ---
 
-<Base title="About" description="Learn more about who we are and what we do.">
+<Base title="About">
 	<div class="about-page">
-		<header class="about-header">
-			<h1 class="about-title" {...page?.edit?.title}>
-				{page?.data?.title || "About"}
-			</h1>
-		</header>
+		<!-- Two-column row: image left, description right -->
+		<div class="about-row">
+			<div class="about-image-wrap">
+				{page.data.page_image
+					? <Image image={page.data.page_image} class="about-img" />
+					: <img src={FALLBACK_IMAGE} alt="About" class="about-img" />
+				}
+			</div>
 
-		<div class="about-content" {...page?.edit?.content}>
-			{
-				page?.data?.content ? (
-					<PortableText value={page.data.content} />
-				) : (
-					<p>Content coming soon.</p>
-				)
-			}
+			<div class="about-content">
+				<p class="about-heading">Hello again.</p>
+				{page.data.content && (
+					<div class="about-body">
+						<PortableText value={page.data.content} />
+					</div>
+				)}
+			</div>
 		</div>
 
-		<aside class="about-sidebar">
-			<div class="sidebar-section">
-				<h3>Services</h3>
-				<ul>
-					<li>Brand Identity</li>
-					<li>Web Design & Development</li>
-					<li>Print Design</li>
-					<li>Photography & Art Direction</li>
-				</ul>
-			</div>
-
-			<div class="sidebar-section">
-				<h3>Contact</h3>
-				<p>
-					<a href="mailto:hello@studio.example">hello@studio.example</a>
-				</p>
-				<p>
-					<a href="/contact">Send us a message →</a>
-				</p>
-			</div>
-		</aside>
+		<!-- CV link -->
+		<div class="cv-wrap">
+			{cvUrl
+				? <a href={cvUrl} target="_blank" rel="noopener noreferrer" class="cv-link">
+					View my CV
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</a>
+				: <span class="cv-link cv-link--placeholder">
+					View my CV
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</span>
+			}
+		</div>
 	</div>
 </Base>
 
 <style>
 	.about-page {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-4xl);
+		padding: 0 var(--page-padding);
+	}
+
+	/* ── Two-column row: image left, text right ── */
+	.about-row {
 		display: grid;
-		grid-template-columns: 2fr 1fr;
-		grid-template-rows: auto 1fr;
-		gap: var(--spacing-4xl);
+		grid-template-columns: 500px 1fr;
+		gap: 60px;
+		align-items: start;
 	}
 
-	.about-header {
-		grid-column: 1 / -1;
+	.about-image-wrap {
+		overflow: hidden;
 	}
 
-	.about-title {
-		font-family: var(--font-serif);
-		font-size: var(--font-size-4xl);
-		font-weight: 500;
-		line-height: 1.1;
+	.about-image-wrap img {
+		width: 100%;
+		height: auto;
+		display: block;
 	}
 
+	/* ── Description column ── */
 	.about-content {
-		font-size: var(--font-size-base);
-		line-height: 1.7;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
 	}
 
-	.about-content :global(p) {
-		margin-bottom: 1.5em;
+	.about-heading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
 	}
 
-	.about-content :global(h2) {
-		font-family: var(--font-serif);
-		font-size: var(--font-size-2xl);
-		font-weight: 500;
-		margin-top: 2.5em;
-		margin-bottom: 0.75em;
-	}
-
-	.about-content :global(h3) {
-		font-family: var(--font-serif);
-		font-size: var(--font-size-xl);
-		font-weight: 500;
-		margin-top: 2em;
-		margin-bottom: 0.5em;
-	}
-
-	.about-sidebar {
-		position: sticky;
-		top: var(--spacing-xl);
-		align-self: start;
-	}
-
-	.sidebar-section {
-		margin-bottom: var(--spacing-2xl);
-	}
-
-	.sidebar-section h3 {
-		font-family: var(--font-serif);
-		font-size: var(--font-size-lg);
-		font-weight: 500;
-		margin-bottom: var(--spacing-md);
-	}
-
-	.sidebar-section ul {
-		list-style: none;
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
-	}
-
-	.sidebar-section li {
-		margin-bottom: var(--spacing-sm);
-	}
-
-	.sidebar-section p {
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-sm);
-	}
-
-	.sidebar-section a {
+	/* PortableText outputs <p> tags for each normal block */
+	.about-body :global(p) {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.6;
+		letter-spacing: 0;
 		color: var(--color-text);
+		margin-bottom: 20px;
+	}
+
+	.about-body :global(p:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* ── CV link ── */
+	.cv-wrap {
+		margin-top: 60px;
+		margin-bottom: 250px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.cv-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
 		text-decoration: none;
-		transition: color var(--transition-fast);
+		color: var(--color-text);
 	}
 
-	.sidebar-section a:hover {
-		color: var(--color-accent);
+	.cv-link:hover {
+		opacity: 0.7;
 	}
 
-	@media (max-width: 768px) {
-		.about-page {
+	.cv-link:active {
+		opacity: 0.45;
+	}
+
+	.cv-link--placeholder {
+		opacity: 0.3;
+		cursor: default;
+	}
+
+	/* ── Responsive ── */
+	@media (max-width: 900px) {
+		.about-row {
+			/* Stack: image on top, content below */
 			grid-template-columns: 1fr;
-			gap: var(--spacing-2xl);
+			gap: 40px;
 		}
 
-		.about-title {
-			font-size: var(--font-size-3xl);
-		}
-
-		.about-sidebar {
-			position: static;
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			gap: var(--spacing-xl);
-			padding-top: var(--spacing-xl);
-			border-top: 1px solid var(--color-border);
-		}
-
-		.sidebar-section {
-			margin-bottom: 0;
+		.about-image-wrap {
+			max-width: 500px;
 		}
 	}
 
-	@media (max-width: 480px) {
-		.about-sidebar {
-			grid-template-columns: 1fr;
+	@media (max-width: 640px) {
+		.cv-wrap {
+			margin-top: 48px;
+			margin-bottom: 120px;
 		}
 	}
 </style>
