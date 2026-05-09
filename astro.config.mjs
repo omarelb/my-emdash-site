@@ -57,6 +57,51 @@ export default defineConfig({
   vite: {
     ssr: {
       external: ["better-sqlite3", "kysely"],
+      optimizeDeps: {
+        include: [
+          "react",
+          "react-dom",
+          "react-dom/client",
+          "react/jsx-runtime",
+          "react/jsx-dev-runtime",
+          "@astrojs/react/client.js",
+          "emdash/ui",
+          "emdash/runtime",
+          "emdash/middleware",
+          "emdash/middleware/redirect",
+          "emdash/middleware/setup",
+          "emdash/middleware/auth",
+          "emdash/middleware/request-context",
+          "emdash/media/local-runtime",
+          "@emdash-cms/admin",
+          "@emdash-cms/plugin-forms",
+          "@emdash-cms/plugin-forms/astro",
+          "@emdash-cms/cloudflare/db/d1",
+          "@emdash-cms/cloudflare/storage/r2",
+          "astro/zod",
+        ],
+      },
+    },
+    environments: {
+      client: {
+        optimizeDeps: {
+          noDiscovery: true,
+          include: [
+            "react",
+            "react-dom",
+            "react-dom/client",
+            "react/jsx-runtime",
+            "react/jsx-dev-runtime",
+            "@astrojs/react/client.js",
+            "emdash/ui",
+            "emdash/runtime",
+            "@emdash-cms/admin",
+          ],
+        },
+      },
+    },
+    resolve: {
+      dedupe: ["react", "react-dom"],
     },
   },
 });

@@ -9,6 +9,7 @@ export interface HomePageSettings {
   id: string;
   slug: string | null;
   status: string;
+  site_name?: string;
   hero_heading?: string;
   hero_subheading?: string;
   createdAt: Date;
@@ -23,13 +24,7 @@ export interface Page {
   status: string;
   title: string;
   content?: PortableTextBlock[];
-  page_image?: {
-    id: string;
-    src?: string;
-    alt?: string;
-    width?: number;
-    height?: number;
-  };
+  page_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
   cv_url?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -42,19 +37,7 @@ export interface Project {
   slug: string | null;
   status: string;
   title: string;
-  featured_image: {
-    id: string;
-    src?: string;
-    alt?: string;
-    width?: number;
-    height?: number;
-  };
-  year?: string;
-  summary?: string;
-  content?: PortableTextBlock[];
-  gallery?: unknown;
-  url?: string;
-  work_caption?: string;
+  featured_image: { id: string; src?: string; alt?: string; width?: number; height?: number };
   client?: string;
   team?: string;
   role?: string;
@@ -62,16 +45,16 @@ export interface Project {
   description?: string;
   project_tagline?: string;
   design_brief?: string;
-  project_secondary_image?: {
-    id: string;
-    src?: string;
-    alt?: string;
-    width?: number;
-    height?: number;
-  };
+  project_secondary_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
   priority?: number;
   home_overlay_text?: string;
   home_text_light?: boolean;
+  year?: string;
+  summary?: string;
+  content?: PortableTextBlock[];
+  work_caption?: string;
+  gallery?: unknown;
+  url?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
