@@ -1,0 +1,164 @@
+---
+import { getEmDashCollection } from "emdash";
+import { Image } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+
+const { entries: projects, cacheHint } = await getEmDashCollection("projects", {
+	orderBy: { published_at: "desc" },
+});
+
+Astro.cache.set(cacheHint);
+---
+
+<Base title="Work">
+	<div class="work-page">
+		{
+			projects.length > 0 ? (
+				<div class="masonry-grid" id="masonry-grid">
+					{projects.map((project) => (
+						<a href={`/projects/${project.id}`} class="work-card">
+							<div class="card-image-wrap">
+								<Image
+									image={project.data.featured_image}
+									class="card-img"
+								/>
+							</div>
+							<div class="card-info">
+								<p class="card-title">
+									{(project.data.title ?? "").toUpperCase()}
+								</p>
+								{project.data.work_caption && (
+									<p class="card-subtitle">{project.data.work_caption}</p>
+								)}
+							</div>
+						</a>
+					))}
+				</div>
+			) : (
+				<p class="empty">
+					No projects yet.{" "}
+					<a href="/_emdash/admin/content/projects/new">Add your first project.</a>
+				</p>
+			)
+		}
+	</div>
+</Base>
+
+<script>
+	// Cursor-parallax: image shifts subtly toward cursor giving a depth effect
+	document.querySelectorAll<HTMLElement>(".work-card").forEach((card) => {
+		const wrap = card.querySelector<HTMLElement>(".card-image-wrap");
+		const img = card.querySelector<HTMLImageElement>("img");
+		if (!wrap || !img) return;
+
+		const SCALE = 1.08;
+		const TRAVEL = 14;
+		let raf = 0;
+
+		wrap.addEventListener("mouseenter", () => {
+			img.style.transition = "transform 0.15s ease";
+			img.style.transform = `scale(${SCALE})`;
+		});
+
+		wrap.addEventListener("mousemove", (e: MouseEvent) => {
+			cancelAnimationFrame(raf);
+			raf = requestAnimationFrame(() => {
+				const rect = wrap.getBoundingClientRect();
+				const x = (e.clientX - rect.left) / rect.width - 0.5;
+				const y = (e.clientY - rect.top) / rect.height - 0.5;
+				img.style.transition = "transform 0.08s linear";
+				img.style.transform = `scale(${SCALE}) translate(${x * TRAVEL}px, ${y * TRAVEL}px)`;
+			});
+		});
+
+		wrap.addEventListener("mouseleave", () => {
+			cancelAnimationFrame(raf);
+			img.style.transition = "transform 0.5s ease";
+			img.style.transform = "scale(1) translate(0, 0)";
+		});
+	});
+</script>
+
+<style>
+	.work-page {
+		padding: 30px var(--page-padding) 0;
+	}
+
+	/* CSS masonry-like two-column layout via CSS columns */
+	.masonry-grid {
+		columns: 2;
+		column-gap: 20px;
+	}
+
+	.work-card {
+		display: block;
+		text-decoration: none;
+		color: var(--color-text);
+		break-inside: avoid;
+		margin-bottom: 20px;
+	}
+
+	/* Clip parallax movement */
+	.card-image-wrap {
+		overflow: hidden;
+		width: 100%;
+	}
+
+	.card-image-wrap img {
+		width: 100%;
+		height: auto;
+		display: block;
+		transform-origin: center center;
+		will-change: transform;
+	}
+
+	.card-info {
+		padding: 6px 0 16px;
+	}
+
+	.card-title {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.card-subtitle {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 13px;
+		line-height: 1;
+		color: #767676;
+		margin-top: 4px;
+	}
+
+	.empty {
+		padding: 80px 0;
+		color: var(--color-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	.empty a {
+		color: var(--color-text);
+	}
+
+	.work-card:hover .card-title {
+		text-decoration: underline;
+	}
+
+	.work-card:hover .card-subtitle {
+		text-decoration: underline;
+		color: var(--color-text);
+	}
+
+	.work-card:active {
+		opacity: 0.8;
+	}
+
+	@media (max-width: 640px) {
+		.masonry-grid {
+			columns: 1;
+		}
+	}
+</style>

@@ -1,0 +1,5 @@
+---
+// Redirect /work/[slug] → /projects/[slug] (canonical project URL)
+const { slug } = Astro.params;
+return Astro.redirect(`/projects/${slug}`, 301);
+---

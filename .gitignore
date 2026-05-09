@@ -3,6 +3,7 @@ dist
 .astro
 uploads
 data.db
+.wrangler
 
 # Environment / Wrangler secrets
 .env
@@ -10,3 +11,12 @@ data.db
 !.env.example
 .dev.vars
 .dev.vars.*
+
+*.jpg
+.playwright-mcp
+*.db-shm
+*.db-wal
+
+
+# Claude
+memory/

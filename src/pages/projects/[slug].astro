@@ -1,0 +1,246 @@
+---
+import { getEmDashEntry } from "emdash";
+import { Image } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/work");
+
+const { entry: project, cacheHint } = await getEmDashEntry("projects", slug);
+if (!project) return Astro.redirect("/work");
+
+Astro.cache.set(cacheHint);
+
+const metaRows = [
+	{ label: "Client", value: project.data.client },
+	{ label: "Team", value: project.data.team },
+	{ label: "Role", value: project.data.role },
+	{ label: "Design Tools", value: project.data.design_tools },
+].filter((row) => row.value);
+---
+
+<Base title={project.data.title ?? "Project"}>
+	<!-- Hero image — full viewport width, fixed 740 px height -->
+	<div class="hero-wrap">
+		<Image image={project.data.featured_image} class="hero-img" />
+	</div>
+
+	<div class="project-body">
+		<!-- Two-column detail row -->
+		<div class="detail-row">
+			<!-- Left: metadata -->
+			<aside class="meta-col">
+				{
+					metaRows.map((row) => (
+						<div class="meta-item">
+							<span class="meta-label">{row.label}</span>
+							<span class="meta-value">{row.value}</span>
+						</div>
+					))
+				}
+			</aside>
+
+			<!-- Right: project description -->
+			{
+				project.data.description && (
+					<p class="project-description">{project.data.description}</p>
+				)
+			}
+		</div>
+
+		<!-- Large tagline -->
+		{
+			project.data.project_tagline && (
+				<p class="project-tagline">
+					{project.data.project_tagline.toUpperCase()}
+				</p>
+			)
+		}
+
+		<!-- Design Brief + Secondary Image -->
+		{
+			(project.data.design_brief || project.data.project_secondary_image) && (
+				<section class="design-brief">
+					{project.data.design_brief && (
+						<Fragment>
+							<span class="brief-header">Design Brief</span>
+							<p class="brief-text">{project.data.design_brief}</p>
+						</Fragment>
+					)}
+					{project.data.project_secondary_image && (
+						<div class="secondary-image-wrap">
+							<Image
+								image={project.data.project_secondary_image}
+								class="secondary-img"
+							/>
+						</div>
+					)}
+				</section>
+			)
+		}
+	</div>
+</Base>
+
+<style>
+	/* ── Hero ── */
+	.hero-wrap {
+		/* Pull up to cancel the 15px gap that Base.astro adds to <main> */
+		margin-top: -15px;
+		width: 100%;
+		height: 740px;
+		overflow: hidden;
+	}
+
+	.hero-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		display: block;
+	}
+
+	/* ── Body (padded content) ── */
+	.project-body {
+		padding: 0 var(--page-padding);
+	}
+
+	/* ── Two-column detail row ── */
+	.detail-row {
+		display: grid;
+		grid-template-columns: 175px 1fr;
+		gap: 60px;
+		margin-top: 30px;
+		align-items: start;
+	}
+
+	/* Left: metadata */
+	.meta-col {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.meta-item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.meta-label {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+		text-transform: uppercase;
+	}
+
+	.meta-value {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+	}
+
+	/* Right: description */
+	.project-description {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-align: left;
+		max-width: 60ch;
+		margin-left: auto;
+	}
+
+	/* ── Large tagline ── */
+	.project-tagline {
+		margin-top: 200px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+		text-align: center;
+	}
+
+	/* ── Design Brief ── */
+	.design-brief {
+		margin-top: 20px;
+		max-width: 60ch;
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 80px;
+		display: flex;
+		flex-direction: column;
+		gap: 28px;
+	}
+
+	.brief-header {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-transform: uppercase;
+	}
+
+	.brief-text {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.5;
+		letter-spacing: 0;
+	}
+
+	/* ── Secondary image (inside design-brief section) ── */
+	.secondary-image-wrap {
+		width: 100%;
+	}
+
+	.secondary-image-wrap img {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	/* ── Responsive ── */
+	@media (max-width: 768px) {
+		.hero-wrap {
+			height: 480px;
+		}
+
+		.detail-row {
+			grid-template-columns: 1fr;
+			gap: 40px;
+		}
+
+		.project-description {
+			font-size: 18px;
+			margin-left: 0;
+		}
+
+		.project-tagline {
+			margin-top: 80px;
+			font-size: 28px;
+			text-align: left;
+		}
+
+		.design-brief {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.hero-wrap {
+			height: 320px;
+		}
+
+		.project-tagline {
+			font-size: 22px;
+		}
+	}
+</style>

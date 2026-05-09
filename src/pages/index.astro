@@ -1,463 +1,580 @@
 ---
-import {
-	getEmDashCollection,
-	getTermsForEntries,
-	getSiteSettings,
-} from "emdash";
+import { getEmDashCollection, getEmDashEntry, getTaxonomyTerms, getEntryTerms } from "emdash";
 import { Image } from "emdash/ui";
 import Base from "../layouts/Base.astro";
-import PostCard from "../components/PostCard.astro";
-import { getReadingTime } from "../utils/reading-time";
-import { resolveBlogSiteIdentity } from "../utils/site-identity";
 
-// Limit to what we render (1 featured + 6 grid). The DB does the slicing
-// instead of fetching every post and discarding the tail in JS.
-const POSTS_PER_PAGE = 7;
-
-const [{ entries: posts, cacheHint }, settings] = await Promise.all([
-	getEmDashCollection("posts", {
-		orderBy: { published_at: "desc" },
-		limit: POSTS_PER_PAGE + 1, // +1 to detect "view all" need
-	}),
-	getSiteSettings(),
+const [
+	{ entry: homeSettings },
+	{ entries: allProjects, cacheHint },
+	workTypes,
+] = await Promise.all([
+	getEmDashEntry("home_settings", "home"),
+	getEmDashCollection("projects", { orderBy: { published_at: "desc" } }),
+	getTaxonomyTerms("work_type"),
 ]);
-const { siteTitle, siteTagline } = resolveBlogSiteIdentity(settings);
 
 Astro.cache.set(cacheHint);
 
-// Trim the lookahead post used to detect overflow
-const visiblePosts = posts.slice(0, POSTS_PER_PAGE);
-const hasMorePosts = posts.length > POSTS_PER_PAGE;
+const heroHeading = homeSettings?.data.hero_heading || "Hello, I'm Josephine.";
+const heroSubheading =
+	homeSettings?.data.hero_subheading ||
+	"An industrial + CMF designer with a mechanical engineering background. I enjoy creating experiences that are fun, meaningful and user-centred.";
 
-// Find the first post with a featured image for the hero
-const featuredPost = visiblePosts.find((p) => p.data.featured_image);
-const featuredIndex = featuredPost ? visiblePosts.indexOf(featuredPost) : -1;
+const workTypeOrder = ["concept-design", "cmf", "user-research", "3d-rendering", "cad"];
+const sortedWorkTypes = [...workTypes].sort((a, b) => {
+	const ia = workTypeOrder.indexOf(a.slug ?? "");
+	const ib = workTypeOrder.indexOf(b.slug ?? "");
+	return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+});
 
-// Get remaining posts (exclude featured if found, limit to 6 for grid)
-const gridPosts = visiblePosts.filter((_, i) => i !== featuredIndex).slice(0, 6);
+// Sort all projects by priority desc
+const projectsByPriority = [...allProjects].sort(
+	(a, b) => ((b.data as any).priority ?? 0) - ((a.data as any).priority ?? 0)
+);
 
-// Single batched query for tags across the featured post + grid posts.
-// Avoids the N+1 pattern of calling getEntryTerms() per entry.
-// Bylines are already hydrated on entry.data.bylines by getEmDashCollection.
-const tagEntryIds = [
-	...(featuredPost ? [featuredPost.data.id] : []),
-	...gridPosts.map((p) => p.data.id),
-];
-const tagsByEntry = await getTermsForEntries("posts", tagEntryIds, "tag");
+// Attach work_type slugs to each project for client-side filtering
+const projectsWithTypes = await Promise.all(
+	projectsByPriority.map(async (p) => {
+		const terms = await getEntryTerms("projects", (p.data as any).id, "work_type").catch(() => [] as any[]);
+		return {
+			project: p,
+			workTypeSlugs: (terms as any[]).map((t) => t.slug).join(","),
+		};
+	})
+);
 
-const featuredTags = featuredPost
-	? (tagsByEntry.get(featuredPost.data.id) ?? []).map((t) => ({
-			slug: t.slug,
-			label: t.label,
-		}))
-	: [];
-const featuredBylines = featuredPost?.data.bylines ?? [];
-
-const gridPostsWithTags = gridPosts.map((post) => ({
-	post,
-	tags: (tagsByEntry.get(post.data.id) ?? []).map((t) => ({
-		slug: t.slug,
-		label: t.label,
-	})),
-	bylines: post.data.bylines ?? [],
-}));
-
-// Format date helper
-function formatDate(date: Date | null | undefined) {
-	if (!date) return null;
-	return date.toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
-}
+// Only show work type tags that have at least one project
+const usedWorkTypeSlugs = new Set(
+	projectsWithTypes.flatMap(({ workTypeSlugs }) => workTypeSlugs.split(",").filter(Boolean))
+);
+const filteredWorkTypes = sortedWorkTypes.filter((t) => usedWorkTypeSlugs.has(t.slug ?? ""));
 ---
 
-<Base title={siteTitle} description={siteTagline}>
-	{
-		posts.length === 0 ? (
-			<section class="empty-state">
-				<h2>No posts yet</h2>
-				<p>Create your first post in the admin panel.</p>
-				<a href="/_emdash/admin/content/posts/new" class="btn">
-					Create a post
-				</a>
-			</section>
-		) : (
-			<div class="home-content">
-				{/* Featured Post - Side by side */}
-				{featuredPost && (
-					<section class="featured-section">
-						<div class="featured-grid">
-							<a href={`/posts/${featuredPost.id}`} class="featured-image-link">
-								<div class="featured-image">
-									<Image image={featuredPost.data.featured_image} />
+<Base>
+	<div class="page">
+		<!-- Hero -->
+		<section class="hero">
+			<h1 class="hero-heading">{heroHeading}</h1>
+			<p class="hero-subheading">{heroSubheading}</p>
+			<a href="/about" class="cta-link">
+				Get to Know Me
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M5 12h14M12 5l7 7-7 7"></path>
+				</svg>
+			</a>
+		</section>
+
+		<!-- Work section -->
+		<section class="work-section">
+			<!-- Header row -->
+			<div class="work-header">
+				<span class="work-title">WORK</span>
+				<div class="work-meta">
+					<span class="selected-work-label">Selected Work</span>
+					<span class="work-years">2021–2026</span>
+				</div>
+			</div>
+
+			<!-- Category tags row — clickable filters -->
+			{
+				filteredWorkTypes.length > 0 && (
+					<div class="work-tags" id="work-tags">
+						{filteredWorkTypes.map((term) => (
+							<button class="work-tag" data-slug={term.slug} type="button">
+								{term.label}<span class="work-tag-deselect" aria-hidden="true"> ×</span>
+							</button>
+						))}
+					</div>
+				)
+			}
+
+			<!-- Project banners (all rendered; JS shows top 2 by priority / filter) -->
+			<div class="projects-list" id="projects-list">
+				{
+					projectsWithTypes.length > 0 ? (
+						projectsWithTypes.map(({ project, workTypeSlugs }) => (
+							<a
+								href={`/projects/${project.id}`}
+								class="project-banner-link"
+								data-project-id={project.id}
+								data-priority={(project.data as any).priority ?? 0}
+								data-work-types={workTypeSlugs}
+							>
+								<div class="project-banner">
+									<div class="banner-image-wrap">
+										<Image
+											image={project.data.featured_image}
+											class="banner-img"
+										/>
+										<div class="banner-darken"></div>
+										<div class="banner-center-gradient"></div>
+									</div>
+									<p
+										class="banner-overlay-text"
+										style={`--overlay-color: ${(project.data as any).home_text_light !== false ? "#ffffff" : "#000000"}`}
+									>
+										{(project.data as any).home_overlay_text || project.data.title}
+									</p>
+									<div
+										class="banner-view-project"
+										style={`--overlay-color: ${(project.data as any).home_text_light !== false ? "#ffffff" : "#000000"}`}
+									>
+										View project
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path d="M5 12h14M12 5l7 7-7 7" />
+										</svg>
+									</div>
 								</div>
 							</a>
-							<div class="featured-content">
-								<div class="featured-meta">
-									{featuredBylines.length > 0 && (
-										<>
-											<div class="featured-bylines">
-												{featuredBylines.slice(0, 2).map((credit, index) => (
-													<>
-														{index > 0 && <span class="byline-sep">,</span>}
-														<span class="featured-byline">
-															{credit.byline.avatarMediaId && (
-																<img
-																	src={`/_emdash/api/media/file/${credit.byline.avatarMediaId}`}
-																	alt={credit.byline.displayName}
-																	class="featured-byline-avatar"
-																/>
-															)}
-															<span class="featured-byline-name">
-																{credit.byline.displayName}
-															</span>
-														</span>
-													</>
-												))}
-												{featuredBylines.length > 2 && (
-													<span class="byline-more">
-														+{featuredBylines.length - 2}
-													</span>
-												)}
-											</div>
-											<span class="meta-dot" />
-										</>
-									)}
-									{formatDate(featuredPost.data.publishedAt) && (
-										<time>{formatDate(featuredPost.data.publishedAt)}</time>
-									)}
-									<span class="meta-dot" />
-									<span>
-										{getReadingTime(featuredPost.data.content)} min read
-									</span>
-								</div>
-								<a
-									href={`/posts/${featuredPost.id}`}
-									class="featured-title-link"
-								>
-									<h1 class="featured-title">{featuredPost.data.title}</h1>
-								</a>
-								{featuredPost.data.excerpt && (
-									<p class="featured-excerpt">{featuredPost.data.excerpt}</p>
-								)}
-								{featuredTags.length > 0 && (
-									<div class="featured-tags">
-										{featuredTags.map((tag) => (
-											<a href={`/tag/${tag.slug}`} class="featured-tag">
-												{tag.label}
-											</a>
-										))}
-									</div>
-								)}
-							</div>
-						</div>
-					</section>
-				)}
-
-				{/* Latest Posts */}
-				{gridPostsWithTags.length > 0 && (
-					<section class="posts-section">
-						<header class="section-header">
-							<h2 class="section-title">Latest</h2>
-							{hasMorePosts && (
-								<a href="/posts" class="section-link">
-									View all
-								</a>
-							)}
-						</header>
-						<div class="posts-grid">
-							{gridPostsWithTags.map(({ post, tags, bylines }) => (
-								<PostCard
-									title={post.data.title ?? "Untitled"}
-									excerpt={post.data.excerpt}
-									featuredImage={post.data.featured_image}
-									href={`/posts/${post.id}`}
-									date={post.data.publishedAt ?? undefined}
-									readingTime={getReadingTime(post.data.content)}
-									tags={tags}
-									bylines={bylines}
-								/>
-							))}
-						</div>
-					</section>
-				)}
+						))
+					) : (
+						<p class="no-projects">
+							No projects yet.{" "}
+							<a href="/_emdash/admin/content/projects">Add your first project.</a>
+						</p>
+					)
+				}
 			</div>
-		)
-	}
+
+			<!-- See more -->
+			<div class="see-more-wrap">
+				<a href="/work" class="see-more-link">
+					See more of my work
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<path d="M5 12h14M12 5l7 7-7 7"></path>
+					</svg>
+				</a>
+			</div>
+		</section>
+	</div>
 </Base>
 
+<script>
+	(function () {
+		let activeFilter: string | null = null;
+
+		function applyFilter(slug: string | null) {
+			activeFilter = slug;
+
+			document.querySelectorAll<HTMLElement>(".work-tag").forEach((tag) => {
+				tag.classList.toggle("active", tag.dataset.slug === slug);
+			});
+
+			const links = [...document.querySelectorAll<HTMLElement>(".project-banner-link")];
+
+			let candidates = links.map((el) => ({
+				el,
+				workTypes: (el.dataset.workTypes || "").split(",").filter(Boolean),
+				priority: parseInt(el.dataset.priority || "0", 10),
+			}));
+
+			if (slug) {
+				candidates = candidates.filter((c) => c.workTypes.includes(slug));
+			}
+
+			candidates.sort((a, b) => b.priority - a.priority);
+			const showEls = new Set(candidates.slice(0, 2).map((c) => c.el));
+
+			links.forEach((link) => {
+				link.style.display = showEls.has(link) ? "" : "none";
+			});
+		}
+
+		// Initial state: show top 2 by priority
+		applyFilter(null);
+
+		document.querySelectorAll<HTMLElement>(".work-tag").forEach((tag) => {
+			tag.addEventListener("click", () => {
+				const slug = tag.dataset.slug || null;
+				// Toggle: clicking the active filter deselects it
+				applyFilter(activeFilter === slug ? null : slug);
+			});
+		});
+	})();
+</script>
+
 <style>
-	.home-content {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: var(--spacing-16) var(--spacing-6);
+	/* ── Page wrapper ── */
+	.page {
+		padding: 0 var(--page-padding);
 	}
 
-	/* Featured Section - Side by side */
-	.featured-section {
-		margin-bottom: var(--spacing-16);
+	/* ── Hero ── */
+	.hero {
+		padding-top: 240px;
+		margin-bottom: 187px;
 	}
 
-	.featured-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--spacing-8);
+	.hero-heading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+		margin-bottom: 32px;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+
+	.hero-subheading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1;
+		letter-spacing: 0;
+		margin-bottom: 145px;
+		max-width: 600px;
+	}
+
+	.cta-link {
+		display: inline-flex;
 		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-decoration: none;
+		color: var(--color-text);
 	}
 
-	.featured-image-link {
-		grid-column: 1 / 3;
-		display: block;
-		/* Extend to viewport edge, but cap at -6rem minimum extension */
-		margin-left: min(
-			-6rem,
-			calc(-1 * (var(--spacing-6) + (100vw - var(--wide-width)) / 2))
-		);
+	.cta-link:hover {
+		opacity: 0.7;
 	}
 
-	.featured-image {
-		overflow: hidden;
-		border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-		background: var(--color-surface);
+	.cta-link:active {
+		opacity: 0.45;
 	}
 
-	.featured-image img {
-		width: 100%;
-		height: auto;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		transition: transform 0.4s ease;
+	/* ── Work section ── */
+	.work-section {
+		padding-top: 28px;
 	}
 
-	.featured-image-link:hover .featured-image img,
-	.featured-grid:has(.featured-title-link:hover) .featured-image img {
+	.work-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 32px;
+	}
+
+	.work-title {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.work-meta {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.selected-work-label {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		text-align: right;
+	}
+
+	.work-years {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1;
+		text-align: right;
+	}
+
+	/* ── Category tags ── */
+	.work-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75em 3em;
+		margin-left: calc(var(--page-padding) * -1 - 13px);
+		margin-bottom: 32px;
+	}
+
+	.work-tag {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: #767676;
+		white-space: nowrap;
+		text-transform: uppercase;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		transition: color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+		transform-origin: left center;
+	}
+
+	.work-tag:hover {
+		color: var(--color-text);
 		transform: scale(1.02);
 	}
 
-	.featured-content {
+	.work-tag:active {
+		opacity: 0.45;
+	}
+
+	.work-tag.active {
+		color: var(--color-text);
+		transform: scale(1.02);
+	}
+
+	.work-tag-deselect {
+		font-size: 0.6em;
+		vertical-align: super;
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.work-tag.active:hover .work-tag-deselect {
+		opacity: 0.6;
+	}
+
+	/* ── Project banners ── */
+	.projects-list {
 		display: flex;
 		flex-direction: column;
-		gap: var(--spacing-4);
+		gap: 0;
+		margin-left: calc(var(--page-padding) * -1);
+		margin-right: calc(var(--page-padding) * -1);
+		margin-bottom: 50px;
 	}
 
-	.featured-meta {
+	.project-banner-link {
+		display: block;
+		margin: 0;
+		text-decoration: none;
+	}
+
+	.project-banner {
+		position: relative;
+		height: 785px;
+		overflow: hidden;
+	}
+
+	.banner-image-wrap {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.banner-image-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform var(--transition-slow);
+	}
+
+	/* Gradient overlay so white text is always readable */
+	.banner-darken {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			180deg,
+			rgba(0, 0, 0, 0.5) 0%,
+			rgba(0, 0, 0, 0.15) 45%,
+			rgba(0, 0, 0, 0) 100%
+		);
+		z-index: 1;
+	}
+
+	/* Concentric radial gradient under the "View project" text — appears on hover */
+	.banner-center-gradient {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0) 80%);
+		opacity: 0;
+		transition: opacity var(--transition-base);
+		z-index: 1;
+	}
+
+	.project-banner-link:hover .banner-center-gradient {
+		opacity: 1;
+	}
+
+	.project-banner-link:hover .banner-image-wrap img {
+		transform: scale(1.04);
+	}
+
+	.banner-overlay-text {
+		position: absolute;
+		top: 16px;
+		left: 20px;
+		max-width: 400px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: var(--overlay-color, #ffffff);
+		white-space: pre-line;
+		z-index: 2;
+	}
+
+	.banner-view-project {
+		position: absolute;
+		inset: 0;
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
-		column-gap: var(--spacing-3);
-		row-gap: var(--spacing-1);
-		font-size: var(--font-size-sm);
+		justify-content: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: var(--overlay-color, #ffffff);
+		opacity: 0;
+		transition: opacity var(--transition-base);
+		z-index: 2;
+	}
+
+	.project-banner-link:hover .banner-view-project {
+		opacity: 1;
+	}
+
+	.no-projects {
+		padding: var(--spacing-4xl) var(--page-padding);
 		color: var(--color-muted);
+		font-size: var(--font-size-sm);
 	}
 
-	.meta-dot {
-		width: 3px;
-		height: 3px;
-		border-radius: 50%;
-		background: var(--color-muted);
+	.no-projects a {
+		color: var(--color-text);
 	}
 
-	/* Featured bylines */
-	.featured-bylines {
+	/* ── See more ── */
+	.see-more-wrap {
+		padding-bottom: 80px;
 		display: flex;
-		align-items: center;
-		gap: 2px;
+		justify-content: center;
 	}
 
-	.featured-byline {
+	.see-more-link {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--spacing-2);
-	}
-
-	.featured-byline-avatar {
-		width: var(--avatar-size-md);
-		height: var(--avatar-size-md);
-		border-radius: 50%;
-		object-fit: cover;
-	}
-
-	.featured-byline-name {
-		font-weight: 500;
-		color: var(--color-text-secondary);
-	}
-
-	.byline-sep {
-		color: var(--color-muted);
-		margin-right: 2px;
-	}
-
-	.byline-more {
-		font-size: var(--font-size-xs);
-		color: var(--color-muted);
-		margin-left: 2px;
-	}
-
-	.featured-title-link {
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
 		text-decoration: none;
-		color: inherit;
-	}
-
-	.featured-title {
-		font-size: clamp(var(--font-size-2xl), 4vw, var(--font-size-4xl));
-		font-weight: 700;
-		line-height: var(--leading-tight);
-		letter-spacing: var(--tracking-tight);
-		transition: color var(--transition-fast);
-	}
-
-	.featured-title-link:hover .featured-title,
-	.featured-grid:has(.featured-image-link:hover) .featured-title {
-		color: var(--color-accent);
-	}
-
-	.featured-excerpt {
-		font-size: var(--font-size-lg);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-	}
-
-	.featured-tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-2);
-		margin-top: var(--spacing-2);
-	}
-
-	.featured-tag {
-		display: inline-block;
-		padding: var(--tag-padding-y) var(--spacing-2);
-		font-size: var(--font-size-xs);
-		color: var(--color-text-secondary);
-		background: var(--color-surface);
-		border-radius: var(--radius);
-		text-decoration: none;
-		transition:
-			color var(--transition-fast),
-			background var(--transition-fast);
-	}
-
-	.featured-tag:hover {
 		color: var(--color-text);
-		background: var(--color-border);
 	}
 
-	/* Section header */
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		margin-bottom: var(--spacing-8);
-		padding-bottom: var(--spacing-4);
-		border-bottom: 1px solid var(--color-border-subtle);
+	.see-more-link:hover {
+		opacity: 0.7;
 	}
 
-	.section-title {
-		font-size: var(--font-size-sm);
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wider);
-		color: var(--color-muted);
+	.see-more-link:active {
+		opacity: 0.45;
 	}
 
-	.section-link {
-		font-size: var(--font-size-sm);
-		color: var(--color-accent);
-		text-decoration: none;
-		transition: color var(--transition-fast);
-	}
-
-	.section-link:hover {
-		color: var(--color-accent-hover);
-	}
-
-	/* Posts Grid */
-	.posts-section {
-	}
-
-	.posts-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--spacing-12) var(--spacing-8);
-	}
-
-	/* Empty State */
-	.empty-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--spacing-3);
-		text-align: center;
-		padding: var(--spacing-20) var(--spacing-6);
-		max-width: 400px;
-		margin: 0 auto;
-	}
-
-	.empty-state h2 {
-		font-size: var(--font-size-2xl);
-		font-weight: 600;
-	}
-
-	.empty-state p {
-		color: var(--color-muted);
-	}
-
-	.btn {
-		display: inline-block;
-		margin-top: var(--spacing-4);
-		padding: var(--spacing-3) var(--spacing-6);
-		background: var(--color-accent);
-		color: var(--color-on-accent);
-		text-decoration: none;
-		border-radius: var(--radius);
-		font-size: var(--font-size-sm);
-		font-weight: 500;
-		transition: background var(--transition-fast);
-	}
-
-	.btn:hover {
-		background: var(--color-accent-hover);
-	}
-
-	/* Responsive */
-	@media (max-width: 900px) {
-		.home-content {
-			padding: var(--spacing-6) var(--spacing-4) var(--spacing-12);
+	/* ── Responsive ── */
+	@media (max-width: 768px) {
+		.hero {
+			padding-top: 120px;
+			margin-bottom: 100px;
 		}
 
-		.featured-image-link {
-			margin-left: 0;
+		.hero-heading {
+			font-size: 28px;
+			margin-bottom: 24px;
 		}
 
-		.featured-grid {
-			grid-template-columns: 1fr;
-			gap: var(--spacing-6);
+		.hero-subheading {
+			font-size: 15px;
+			margin-bottom: 80px;
 		}
 
-		.featured-image {
-			border-radius: var(--radius-lg);
+		.work-title {
+			font-size: 28px;
 		}
 
-		.featured-image img {
-			aspect-ratio: 16 / 9;
+		.work-tags {
+			gap: 0.5em 2.5em;
+			margin-left: calc(var(--page-padding) * -0.3);
 		}
 
-		.posts-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: var(--spacing-8) var(--spacing-6);
+		.work-tag {
+			font-size: 28px;
+		}
+
+		.project-banner {
+			height: 480px;
+		}
+
+		.cta-link,
+		.see-more-link {
+			font-size: 18px;
 		}
 	}
 
-	@media (max-width: 600px) {
-		.featured-title {
-			font-size: var(--font-size-2xl);
+	@media (max-width: 480px) {
+		.hero {
+			padding-top: 80px;
+			margin-bottom: 80px;
 		}
 
-		.posts-grid {
-			grid-template-columns: 1fr;
-			gap: var(--spacing-8);
+		.hero-heading {
+			font-size: 24px;
+		}
+
+		.hero-subheading {
+			margin-bottom: 60px;
+		}
+
+		.work-tag {
+			font-size: 22px;
+		}
+
+		.project-banner {
+			height: 360px;
 		}
 	}
 </style>
