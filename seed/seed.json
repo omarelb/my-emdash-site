@@ -90,16 +90,6 @@
 					"type": "string"
 				},
 				{
-					"slug": "design_brief",
-					"label": "Design Brief",
-					"type": "text"
-				},
-				{
-					"slug": "project_secondary_image",
-					"label": "Secondary Image",
-					"type": "image"
-				},
-				{
 					"slug": "priority",
 					"label": "Priority (higher = shown first on home page)",
 					"type": "integer"
@@ -417,6 +407,30 @@
 					"content": [
 						{
 							"_type": "block",
+							"style": "h2",
+							"_key": "et_db_h",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et_db_hs",
+									"text": "Design Brief"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "et_db_p",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "et_db_ps",
+									"text": "The Municipality of Dordrecht commissioned a concept for urban furniture that would make the 2030 energy transition legible and engaging at street level. The brief called for a piece that generates renewable energy, provides a public amenity, and opens a conversation about sustainable urban living \u2014 without resorting to didactic signage or green-washing aesthetics. The design needed to integrate into the existing streetscape language while standing out enough to invite curiosity."
+								}
+							]
+						},
+						{
+							"_type": "block",
 							"style": "normal",
 							"_key": "et0",
 							"children": [
@@ -519,6 +533,30 @@
 						}
 					},
 					"content": [
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "mb_db_h",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "mb_db_hs",
+									"text": "Design Brief"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "mb_db_p",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "mb_db_ps",
+									"text": "Meridian Collective needed a visual identity flexible enough to live across gallery invitations, Instagram grids, exhibition catalogues, and digital interfaces \u2014 without feeling like it belonged to only one of those contexts. The brief specified no illustrative elements: typography and colour alone had to do all the work. The identity also needed to scale gracefully from a business card to a 6-metre exhibition banner."
+								}
+							]
+						},
 						{
 							"_type": "block",
 							"style": "normal",
@@ -631,6 +669,30 @@
 					"content": [
 						{
 							"_type": "block",
+							"style": "h2",
+							"_key": "vw_db_h",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "vw_db_hs",
+									"text": "Design Brief"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "vw_db_p",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "vw_db_ps",
+									"text": "Volta Energy had strong technology and competitive pricing but a website that its own sales team described as “too engineering-focused.” The brief asked for a redesign that would reduce the average time-to-quote from 6 minutes to under 2, increase conversion on mobile (where 68% of traffic arrived), and establish Volta as the most approachable brand in the Dutch residential solar market."
+								}
+							]
+						},
+						{
+							"_type": "block",
 							"style": "normal",
 							"_key": "vw0",
 							"children": [
@@ -738,6 +800,30 @@
 					"content": [
 						{
 							"_type": "block",
+							"style": "h2",
+							"_key": "ap_db_h",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ap_db_hs",
+									"text": "Design Brief"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "ap_db_p",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ap_db_ps",
+									"text": "The City Museum required a complete print identity for The Archive: a 240-page hardcover catalogue, exhibition posters in three sizes, room-by-room wayfinding, and an accompanying zine for younger visitors. The catalogue needed to function both as an academic reference and as a desirable object in the museum shop. Budget constraints meant two-colour printing throughout, with the cover as the only four-colour exception."
+								}
+							]
+						},
+						{
+							"_type": "block",
 							"style": "normal",
 							"_key": "ap0",
 							"children": [
@@ -842,6 +928,30 @@
 						}
 					},
 					"content": [
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "cp_db_h",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "cp_db_hs",
+									"text": "Design Brief"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "cp_db_p",
+							"children": [
+								{
+									"_type": "span",
+									"_key": "cp_db_ps",
+									"text": "A self-initiated project with no client brief, which meant the brief had to be written retroactively from the work itself. After the first month of shooting it became clear that the project was not about the coast as a place but about the quality of attention that slow photography demands. The constraint: only shoot during the transitional hours. No midday frames. No artificial light. Every image had to be earned by being present at the right moment."
+								}
+							]
+						},
 						{
 							"_type": "block",
 							"style": "normal",

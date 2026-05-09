@@ -1,6 +1,6 @@
 ---
 import { getEmDashEntry } from "emdash";
-import { Image } from "emdash/ui";
+import { Image, PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 
 const { slug } = Astro.params;
@@ -57,24 +57,11 @@ const metaRows = [
 			)
 		}
 
-		<!-- Design Brief + Secondary Image -->
+		<!-- Project Content -->
 		{
-			(project.data.design_brief || project.data.project_secondary_image) && (
-				<section class="design-brief">
-					{project.data.design_brief && (
-						<Fragment>
-							<span class="brief-header">Design Brief</span>
-							<p class="brief-text">{project.data.design_brief}</p>
-						</Fragment>
-					)}
-					{project.data.project_secondary_image && (
-						<div class="secondary-image-wrap">
-							<Image
-								image={project.data.project_secondary_image}
-								class="secondary-img"
-							/>
-						</div>
-					)}
+			project.data.content && (
+				<section class="project-content">
+					<PortableText value={project.data.content} />
 				</section>
 			)
 		}
@@ -166,8 +153,8 @@ const metaRows = [
 		text-align: center;
 	}
 
-	/* ── Design Brief ── */
-	.design-brief {
+	/* ── Project Content ── */
+	.project-content {
 		margin-top: 20px;
 		max-width: 60ch;
 		margin-left: auto;
@@ -178,29 +165,43 @@ const metaRows = [
 		gap: 28px;
 	}
 
-	.brief-header {
+	.project-content :global(h1),
+	.project-content :global(h2),
+	.project-content :global(h3),
+	.project-content :global(h4),
+	.project-content :global(h5),
+	.project-content :global(h6) {
 		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
 		font-weight: 600;
-		font-size: 14px;
 		line-height: 1;
 		letter-spacing: 0;
 		text-transform: uppercase;
+		margin: 0;
 	}
 
-	.brief-text {
+	.project-content :global(h1) {
+		font-size: 20px;
+		font-weight: 700;
+	}
+
+	.project-content :global(h2) {
+		font-size: 14px;
+	}
+
+	.project-content :global(h3) {
+		font-size: 12px;
+	}
+
+	.project-content :global(p) {
 		font-family: var(--font-inter), Inter, sans-serif;
 		font-weight: 400;
 		font-size: 16px;
 		line-height: 1.5;
 		letter-spacing: 0;
+		margin: 0;
 	}
 
-	/* ── Secondary image (inside design-brief section) ── */
-	.secondary-image-wrap {
-		width: 100%;
-	}
-
-	.secondary-image-wrap img {
+	.project-content :global(img) {
 		width: 100%;
 		height: auto;
 		display: block;
@@ -217,6 +218,10 @@ const metaRows = [
 			gap: 40px;
 		}
 
+		.meta-label {
+			font-weight: 700;
+		}
+
 		.project-description {
 			font-size: 18px;
 			margin-left: 0;
@@ -228,7 +233,7 @@ const metaRows = [
 			text-align: left;
 		}
 
-		.design-brief {
+		.project-content {
 			margin-left: 0;
 			margin-right: 0;
 		}
