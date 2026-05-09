@@ -6,7 +6,7 @@ import { defineConfig, fontProviders } from "astro/config";
 import emdash, { local } from "emdash/astro";
 import { sqlite } from "emdash/db";
 
-const isCloudflare = !!process.env.CF_PAGES;
+const isCloudflare = !!process.env.CF_PAGES || !!process.env.WORKERS_CI;
 
 // Cloudflare-specific modules are loaded dynamically so they don't get
 // bundled (and fail to resolve `cloudflare:workers`) in local Node dev.
