@@ -82,7 +82,7 @@ const pageCtx = createPublicPageContext({
 				<div class="nav-links">
 					<a href="/" title="Go to home page" class:list={{ "nav-current": currentPath === "/" }}>HOME</a>
 					<a href="/about" title="About me" class:list={{ "nav-current": currentPath === "/about" }}>ABOUT</a>
-					<a href="/work" title="View selected work" class:list={{ "nav-current": currentPath === "/work" || currentPath.startsWith("/projects/") || currentPath.startsWith("/work/") }}>WORK</a>
+					<a href="/work" title="View selected work" class:list={{ "nav-current": currentPath === "/work" || currentPath.startsWith("/work/") }}>WORK</a>
 					<a href="/contact" title="Get in touch" class:list={{ "nav-current": currentPath === "/contact" }}>CONTACT</a>
 					<a href="/_emdash/admin" class="nav-admin" hidden>Admin</a>
 				</div>
@@ -96,7 +96,7 @@ const pageCtx = createPublicPageContext({
 			<nav class="sidebar-nav">
 				<a href="/" class:list={{ "nav-current": currentPath === "/" }}>HOME</a>
 				<a href="/about" class:list={{ "nav-current": currentPath === "/about" }}>ABOUT</a>
-				<a href="/work" class:list={{ "nav-current": currentPath === "/work" || currentPath.startsWith("/projects/") || currentPath.startsWith("/work/") }}>WORK</a>
+				<a href="/work" class:list={{ "nav-current": currentPath === "/work" || currentPath.startsWith("/work/") }}>WORK</a>
 				<a href="/contact" class:list={{ "nav-current": currentPath === "/contact" }}>CONTACT</a>
 			</nav>
 		</div>

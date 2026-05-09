@@ -130,6 +130,12 @@
           "slug": "url",
           "label": "Project URL",
           "type": "string"
+        },
+        {
+          "slug": "private",
+          "type": "boolean",
+          "label": "Private",
+          "description": "When on, the project content section is gated behind the request-access flow."
         }
       ]
     },

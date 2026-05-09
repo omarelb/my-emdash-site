@@ -44,8 +44,6 @@ export interface Project {
   design_tools?: string;
   description?: string;
   project_tagline?: string;
-  design_brief?: string;
-  project_secondary_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
   priority?: number;
   home_overlay_text?: string;
   home_text_light?: boolean;
@@ -55,6 +53,7 @@ export interface Project {
   work_caption?: string;
   gallery?: unknown;
   url?: string;
+  private?: boolean;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
