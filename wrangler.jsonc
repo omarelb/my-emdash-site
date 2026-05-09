@@ -2,6 +2,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-emdash-site",
   "main": "./src/worker.ts",
+  // astro:content is a Vite virtual module that the @cloudflare/vite-plugin worker
+  // environment can't resolve. This alias redirects it to a real stub that wires
+  // up the emdash loader directly, matching what Astro generates at build time.
+  "alias": {
+    "astro:content": "./src/astro-content-stub.js",
+  },
   "compatibility_date": "2026-02-24",
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [
