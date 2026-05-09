@@ -1,15 +1,27 @@
-import cloudflare from "@astrojs/cloudflare";
+import node from "@astrojs/node";
 import react from "@astrojs/react";
 import { atproto } from "@emdash-cms/auth-atproto";
-import { d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { formsPlugin } from "@emdash-cms/plugin-forms";
-import { webhookNotifierPlugin } from "@emdash-cms/plugin-webhook-notifier";
 import { defineConfig, fontProviders } from "astro/config";
-import emdash from "emdash/astro";
+import emdash, { local } from "emdash/astro";
+import { sqlite } from "emdash/db";
+
+const isCloudflare = !!process.env.CF_PAGES;
+
+// Cloudflare-specific modules are loaded dynamically so they don't get
+// bundled (and fail to resolve `cloudflare:workers`) in local Node dev.
+const { default: cloudflare, d1, r2, sandbox, webhookNotifierPlugin } =
+  isCloudflare
+    ? {
+        ...(await import("@astrojs/cloudflare")),
+        ...(await import("@emdash-cms/cloudflare")),
+        ...(await import("@emdash-cms/plugin-webhook-notifier")),
+      }
+    : {};
 
 export default defineConfig({
   output: "server",
-  adapter: cloudflare(),
+  adapter: isCloudflare ? cloudflare() : node({ mode: "standalone" }),
   image: {
     layout: "constrained",
     responsiveStyles: true,
@@ -17,17 +29,23 @@ export default defineConfig({
   integrations: [
     react(),
     emdash({
-      database: d1({ binding: "DB", session: "auto" }),
-      storage: r2({ binding: "MEDIA" }),
+      database: isCloudflare
+        ? d1({ binding: "DB", session: "auto" })
+        : sqlite({ url: "file:./data.db" }),
+      storage: isCloudflare
+        ? r2({ binding: "MEDIA" })
+        : local({ directory: "./uploads", baseUrl: "/_emdash/api/media/file" }),
       authProviders: [
         atproto({
           allowedHandles: ["omarelb.bsky.social"],
         }),
       ],
       plugins: [formsPlugin()],
-      sandboxed: [webhookNotifierPlugin()],
-      sandboxRunner: sandbox(),
-      marketplace: "https://marketplace.emdashcms.com",
+      ...(isCloudflare && {
+        sandboxed: [webhookNotifierPlugin()],
+        sandboxRunner: sandbox(),
+        marketplace: "https://marketplace.emdashcms.com",
+      }),
     }),
   ],
   fonts: [
@@ -57,30 +75,9 @@ export default defineConfig({
   vite: {
     ssr: {
       external: ["better-sqlite3", "kysely"],
-      optimizeDeps: {
-        include: [
-          "react",
-          "react-dom",
-          "react-dom/client",
-          "react/jsx-runtime",
-          "react/jsx-dev-runtime",
-          "@astrojs/react/client.js",
-          "emdash/ui",
-          "emdash/runtime",
-          "emdash/middleware",
-          "emdash/middleware/redirect",
-          "emdash/middleware/setup",
-          "emdash/middleware/auth",
-          "emdash/middleware/request-context",
-          "emdash/media/local-runtime",
-          "@emdash-cms/admin",
-          "@emdash-cms/plugin-forms",
-          "@emdash-cms/plugin-forms/astro",
-          "@emdash-cms/cloudflare/db/d1",
-          "@emdash-cms/cloudflare/storage/r2",
-          "astro/zod",
-        ],
-      },
+      // emdash server modules use virtual:emdash/* imports that only resolve
+      // at runtime via Astro's plugin system — exclude them from pre-bundling.
+      noExternal: isCloudflare ? [/emdash/, /@emdash-cms/] : [],
     },
     environments: {
       client: {

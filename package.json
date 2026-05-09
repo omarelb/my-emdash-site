@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.7",
+    "@astrojs/node": "^10.1.0",
     "@astrojs/react": "^5.0.0",
     "@emdash-cms/auth-atproto": "^0.2.2",
     "@emdash-cms/cloudflare": "^0.9.0",
