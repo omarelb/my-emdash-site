@@ -1,0 +1,258 @@
+---
+import Base from "../layouts/Base.astro";
+
+let formStatus: "idle" | "success" | "error" = "idle";
+let formMessage = "";
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await Astro.request.formData();
+		const name = formData.get("name")?.toString() || "";
+		const email = formData.get("email")?.toString() || "";
+		const message = formData.get("message")?.toString() || "";
+
+		if (!name || !email || !message) {
+			formStatus = "error";
+			formMessage = "Please fill in all fields.";
+		} else if (!email.includes("@")) {
+			formStatus = "error";
+			formMessage = "Please enter a valid email address.";
+		} else {
+			console.log("Contact form submission:", { name, email, message });
+			formStatus = "success";
+			formMessage = "Thanks for reaching out! I'll get back to you soon.";
+		}
+	} catch {
+		formStatus = "error";
+		formMessage = "Something went wrong. Please try again.";
+	}
+}
+---
+
+<Base title="Contact">
+	<div class="contact-page">
+		<div class="contact-header">
+			<p class="contact-title">Get in Touch</p>
+			<p class="contact-intro">
+				Have a project in mind? I'd love to hear about it. Fill out the form below
+				and I'll get back to you within 24 hours.
+			</p>
+		</div>
+
+		{formStatus === "success" ? (
+			<div class="form-success">
+				<p class="success-message">{formMessage}</p>
+				<a href="/contact" class="form-reset">
+					Send another message
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</a>
+			</div>
+		) : (
+			<form method="POST" class="contact-form">
+				{formStatus === "error" && (
+					<p class="form-error">{formMessage}</p>
+				)}
+
+				<div class="form-field">
+					<label for="name">Name</label>
+					<input
+						type="text"
+						id="name"
+						name="name"
+						required
+						placeholder="Your name"
+						autocomplete="name"
+					/>
+				</div>
+
+				<div class="form-field">
+					<label for="email">Email</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						required
+						placeholder="you@example.com"
+						autocomplete="email"
+					/>
+				</div>
+
+				<div class="form-field">
+					<label for="message">Message</label>
+					<textarea
+						id="message"
+						name="message"
+						required
+						rows="6"
+						placeholder="Tell me about your project..."
+					></textarea>
+				</div>
+
+				<button type="submit" class="form-submit">
+					Send Message
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</button>
+			</form>
+		)}
+	</div>
+</Base>
+
+<style>
+	.contact-page {
+		padding: 0 var(--page-padding) 200px;
+		max-width: 600px;
+	}
+
+	/* ── Header ── */
+	.contact-title {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-transform: uppercase;
+		margin-bottom: 32px;
+	}
+
+	.contact-intro {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.6;
+		letter-spacing: 0;
+		margin-bottom: 60px;
+		max-width: 480px;
+	}
+
+	/* ── Form ── */
+	.contact-form {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.form-field label {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+		text-transform: uppercase;
+	}
+
+	.form-field input,
+	.form-field textarea {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1;
+		color: var(--color-text);
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--color-text);
+		padding: 8px 0;
+		transition: border-color var(--transition-fast);
+		outline: none;
+		width: 100%;
+	}
+
+	.form-field textarea {
+		resize: none;
+		min-height: 120px;
+		line-height: 1.5;
+	}
+
+	.form-field input::placeholder,
+	.form-field textarea::placeholder {
+		color: #767676;
+	}
+
+	.form-field input:focus,
+	.form-field textarea:focus {
+		border-bottom-color: var(--color-text);
+	}
+
+	/* ── Submit button ── */
+	.form-submit {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: var(--color-text);
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		margin-top: 8px;
+		transition: opacity var(--transition-fast);
+	}
+
+	.form-submit:hover {
+		opacity: 0.7;
+	}
+
+	.form-submit:active {
+		opacity: 0.45;
+	}
+
+	/* ── Error / Success ── */
+	.form-error {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 14px;
+		color: #dc2626;
+	}
+
+	.form-success {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.success-message {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.6;
+	}
+
+	.form-reset {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		text-decoration: none;
+		color: var(--color-text);
+		transition: opacity var(--transition-fast);
+	}
+
+	.form-reset:hover {
+		opacity: 0.7;
+	}
+
+	.form-reset:active {
+		opacity: 0.45;
+	}
+
+	@media (max-width: 640px) {
+		.contact-title {
+			font-size: 28px;
+		}
+	}
+</style>

@@ -1,0 +1,612 @@
+---
+import { getEmDashEntry } from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import "@emdash-cms/plugin-forms/styles";
+import Base from "../../layouts/Base.astro";
+import { isUnlocked } from "../../lib/access";
+import PluginForm from "../../components/PluginForm.astro";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/work");
+
+const { entry: project, cacheHint } = await getEmDashEntry("projects", slug);
+if (!project) return Astro.redirect("/work");
+
+Astro.cache.set(cacheHint);
+
+const isPrivate = !!project.data.private;
+const unlocked = isPrivate
+	? await isUnlocked(Astro.cookies, Astro.locals)
+	: true;
+
+const error = Astro.url.searchParams.get("error") === "1";
+
+const metaRows = [
+	{ label: "Client", value: project.data.client },
+	{ label: "Team", value: project.data.team },
+	{ label: "Role", value: project.data.role },
+	{ label: "Design Tools", value: project.data.design_tools },
+].filter((row) => row.value);
+---
+
+<Base title={project.data.title ?? "Project"}>
+	<!-- Hero image — full viewport width, fixed 740 px height -->
+	<div class="hero-wrap">
+		<Image image={project.data.featured_image} class="hero-img" />
+	</div>
+
+	<div class="project-body">
+		<!-- Two-column detail row -->
+		<div class="detail-row">
+			<!-- Left: metadata -->
+			<aside class="meta-col">
+				{
+					metaRows.map((row) => (
+						<div class="meta-item">
+							<span class="meta-label">{row.label}</span>
+							<span class="meta-value">{row.value}</span>
+						</div>
+					))
+				}
+			</aside>
+
+			<!-- Right: project description -->
+			{
+				project.data.description && (
+					<p class="project-description">{project.data.description}</p>
+				)
+			}
+		</div>
+
+		<!-- Large tagline -->
+		{
+			project.data.project_tagline && (
+				<p class="project-tagline">
+					{project.data.project_tagline.toUpperCase()}
+				</p>
+			)
+		}
+
+		<!-- Project Content -->
+		{unlocked && project.data.content && (
+			<section class="project-content">
+				<PortableText value={project.data.content} />
+			</section>
+		)}
+
+		{isPrivate && !unlocked && (
+			<Fragment>
+				<section class="project-locked">
+					<svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+						<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+					</svg>
+					<p class="locked-label">This project is private.</p>
+					<button class="unlock-btn">
+						Request access
+						<svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M3 8h10M9 4l4 4-4 4" />
+						</svg>
+					</button>
+				</section>
+
+				<dialog id="access-dialog" class="access-dialog">
+					<button class="dialog-close" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16">
+							<line x1="18" y1="6" x2="6" y2="18" />
+							<line x1="6" y1="6" x2="18" y2="18" />
+						</svg>
+					</button>
+
+					<div class="dialog-section">
+						<h2 class="dialog-heading">Unlock with password</h2>
+						<form method="POST" action="/api/unlock" class="unlock-form">
+							<input type="hidden" name="from" value={slug} />
+							<input
+								type="password"
+								name="password"
+								placeholder="Enter password"
+								class="password-input"
+								required
+							/>
+							{error && <p class="error-msg">Incorrect password. Try again.</p>}
+							<button type="submit" class="submit-btn">Unlock</button>
+						</form>
+					</div>
+
+					<div class="dialog-divider">
+						<span>or</span>
+					</div>
+
+					<div class="dialog-section">
+						<h2 class="dialog-heading">Request access</h2>
+						<PluginForm id="request-access" />
+					</div>
+				</dialog>
+			</Fragment>
+		)}
+	</div>
+</Base>
+
+<script>
+	const dialog = document.getElementById("access-dialog") as HTMLDialogElement | null;
+
+	function openDialog() {
+		dialog?.showModal();
+		document.documentElement.style.overflowY = "hidden";
+	}
+
+	function closeDialog() {
+		dialog?.close();
+		document.documentElement.style.overflowY = "";
+	}
+
+	// Re-open on page load if there was a password error
+	if (dialog && new URLSearchParams(location.search).get("error") === "1") {
+		openDialog();
+	}
+
+	// Close only on backdrop click (outside dialog box), not on padding clicks
+	dialog?.addEventListener("click", (e) => {
+		const rect = dialog.getBoundingClientRect();
+		const clickedInside =
+			e.clientX >= rect.left &&
+			e.clientX <= rect.right &&
+			e.clientY >= rect.top &&
+			e.clientY <= rect.bottom;
+		if (!clickedInside) closeDialog();
+	});
+
+	// Restore scroll when dialog is closed any other way (Escape key, etc.)
+	dialog?.addEventListener("close", () => {
+		document.documentElement.style.overflowY = "";
+	});
+
+	// Wire the "Request access" button (it's in a section outside the dialog)
+	document.querySelector(".unlock-btn")?.addEventListener("click", openDialog);
+	document.querySelector(".dialog-close")?.addEventListener("click", closeDialog);
+</script>
+
+<style>
+	/* ── Hero ── */
+	.hero-wrap {
+		/* Pull up to cancel the 15px gap that Base.astro adds to <main> */
+		margin-top: -15px;
+		width: 100%;
+		height: 740px;
+		overflow: hidden;
+	}
+
+	.hero-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		display: block;
+	}
+
+	/* ── Body (padded content) ── */
+	.project-body {
+		padding: 0 var(--page-padding);
+	}
+
+	/* ── Two-column detail row ── */
+	.detail-row {
+		display: grid;
+		grid-template-columns: 175px 1fr;
+		gap: 60px;
+		margin-top: 30px;
+		align-items: start;
+	}
+
+	/* Left: metadata */
+	.meta-col {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+
+	.meta-item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.meta-label {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+		text-transform: uppercase;
+	}
+
+	.meta-value {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+	}
+
+	/* Right: description */
+	.project-description {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-align: left;
+		max-width: 60ch;
+		margin-left: auto;
+	}
+
+	/* ── Large tagline ── */
+	.project-tagline {
+		margin-top: 200px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 40px;
+		line-height: 1;
+		letter-spacing: -0.05em;
+		text-align: center;
+	}
+
+	/* ── Project Content ── */
+	.project-content {
+		margin-top: 20px;
+		max-width: 60ch;
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 80px;
+		display: flex;
+		flex-direction: column;
+		gap: 28px;
+	}
+
+	.project-content :global(h1),
+	.project-content :global(h2),
+	.project-content :global(h3),
+	.project-content :global(h4),
+	.project-content :global(h5),
+	.project-content :global(h6) {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: 0;
+		text-transform: uppercase;
+		margin: 0;
+	}
+
+	.project-content :global(h1:not(:first-child)),
+	.project-content :global(h2:not(:first-child)),
+	.project-content :global(h3:not(:first-child)),
+	.project-content :global(h4:not(:first-child)),
+	.project-content :global(h5:not(:first-child)),
+	.project-content :global(h6:not(:first-child)) {
+		margin-top: 24px;
+	}
+
+	.project-content :global(h1) {
+		font-size: 20px;
+		font-weight: 700;
+	}
+
+	.project-content :global(h2) {
+		font-size: 14px;
+	}
+
+	.project-content :global(h3) {
+		font-size: 12px;
+	}
+
+	.project-content :global(p) {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.5;
+		letter-spacing: 0;
+		margin: 0;
+	}
+
+	.project-content :global(img) {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	/* ── Locked state ── */
+	.project-locked {
+		margin-top: 60px;
+		margin-bottom: 80px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.lock-icon {
+		width: 36px;
+		height: 36px;
+		opacity: 0.35;
+	}
+
+	.locked-label {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 15px;
+		font-weight: 400;
+		letter-spacing: 0;
+		margin: 0;
+		opacity: 0.5;
+	}
+
+	/* Text + arrow link style, matching nav/footer links */
+	.unlock-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 15px;
+		font-weight: 400;
+		letter-spacing: 0;
+		background: none;
+		border: none;
+		color: currentColor;
+		cursor: pointer;
+		padding: 0;
+		text-decoration: none;
+		transition: opacity var(--transition-fast);
+	}
+
+	.unlock-btn:hover {
+		opacity: 0.6;
+	}
+
+	.unlock-btn:active {
+		opacity: 0.35;
+	}
+
+	.arrow-icon {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	/* ── Access dialog ── */
+	.access-dialog {
+		position: fixed;
+		inset: 0;
+		margin: auto;
+		width: min(460px, calc(100vw - 32px));
+		max-height: calc(100dvh - 40px);
+		overflow-y: auto;
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		background: var(--color-bg);
+		color: var(--color-text);
+		padding: 36px;
+		box-shadow: 0 8px 48px rgba(0,0,0,0.12);
+	}
+
+	.access-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.35);
+		backdrop-filter: blur(3px);
+	}
+
+	.dialog-close {
+		position: absolute;
+		top: 14px;
+		right: 14px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: currentColor;
+		opacity: 0.4;
+		padding: 6px;
+		display: flex;
+		align-items: center;
+		border-radius: 4px;
+		transition: opacity var(--transition-fast);
+	}
+
+	.dialog-close:hover {
+		opacity: 1;
+	}
+
+	.dialog-heading {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		margin: 0 0 14px 0;
+		opacity: 0.5;
+	}
+
+	.dialog-section {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.unlock-form {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.password-input {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 15px;
+		background: transparent;
+		border: 1px solid var(--color-border);
+		color: var(--color-text);
+		padding: 10px 12px;
+		outline: none;
+		width: 100%;
+		box-sizing: border-box;
+		border-radius: 6px;
+		transition: border-color var(--transition-fast);
+	}
+
+	.password-input:focus {
+		border-color: var(--color-text);
+	}
+
+	.error-msg {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 13px;
+		color: #c0392b;
+		margin: 0;
+	}
+
+	.submit-btn {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.07em;
+		text-transform: uppercase;
+		background: var(--color-text);
+		color: var(--color-bg);
+		border: none;
+		padding: 10px 20px;
+		border-radius: 6px;
+		cursor: pointer;
+		align-self: flex-start;
+		transition: opacity var(--transition-fast);
+	}
+
+	.submit-btn:hover {
+		opacity: 0.75;
+	}
+
+	.dialog-divider {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin: 24px 0;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		opacity: 0.35;
+	}
+
+	.dialog-divider::before,
+	.dialog-divider::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background: currentColor;
+	}
+
+	/* ── Forms plugin overrides (ec-form-*) inside dialog ── */
+	.access-dialog :global(.ec-form) {
+		--ec-form-gap: 0.75rem;
+		--ec-form-field-border: 1px solid var(--color-border);
+		--ec-form-field-radius: 6px;
+		--ec-form-field-padding: 10px 12px;
+		--ec-form-field-bg: transparent;
+		--ec-form-error-color: #c0392b;
+		--ec-form-required-color: #c0392b;
+		--ec-form-submit-bg: var(--color-text);
+		--ec-form-submit-color: var(--color-bg);
+		--ec-form-submit-radius: 6px;
+		--ec-form-submit-padding: 10px 20px;
+	}
+
+	.access-dialog :global(.ec-form-input),
+	.access-dialog :global(.ec-form select),
+	.access-dialog :global(.ec-form textarea) {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-size: 15px;
+		color: var(--color-text);
+		background: transparent;
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		transition: border-color var(--transition-fast);
+	}
+
+	.access-dialog :global(.ec-form-input:focus),
+	.access-dialog :global(.ec-form select:focus),
+	.access-dialog :global(.ec-form textarea:focus) {
+		outline: none;
+		border-color: var(--color-text);
+	}
+
+	.access-dialog :global(.ec-form-label) {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-text);
+	}
+
+	.access-dialog :global(.ec-form-submit) {
+		font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.07em;
+		text-transform: uppercase;
+		transition: opacity var(--transition-fast);
+	}
+
+	.access-dialog :global(.ec-form-submit:hover) {
+		opacity: 0.75;
+	}
+
+	.access-dialog :global(.ec-form-status--success) {
+		background: transparent;
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+	}
+
+	.access-dialog :global(.ec-form-status--error) {
+		background: transparent;
+		color: #c0392b;
+		border: 1px solid #c0392b;
+		border-radius: 6px;
+	}
+
+	/* ── Responsive ── */
+	@media (max-width: 768px) {
+		.hero-wrap {
+			height: 480px;
+		}
+
+		.detail-row {
+			grid-template-columns: 1fr;
+			gap: 40px;
+		}
+
+		.meta-label {
+			font-weight: 700;
+		}
+
+		.project-description {
+			font-size: 18px;
+			margin-left: 0;
+		}
+
+		.project-tagline {
+			margin-top: 80px;
+			font-size: 28px;
+			text-align: left;
+		}
+
+		.project-content {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.hero-wrap {
+			height: 320px;
+		}
+
+		.project-tagline {
+			font-size: 22px;
+		}
+	}
+</style>

@@ -1,27 +1,37 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-emdash-site",
-	"main": "./src/worker.ts",
-	"compatibility_date": "2026-02-24",
-	"compatibility_flags": ["nodejs_compat"],
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "my-emdash-site",
-			// Run `wrangler d1 create my-emdash-site` and paste the real ID here for deploy
-			"database_id": "388fbf08-0688-4f48-a60f-bd9078e79923",
-		},
-	],
-	"r2_buckets": [
-		{
-			"binding": "MEDIA",
-			"bucket_name": "my-emdash-media","preview_bucket_name": "my-emdash-media",
-		},
-	],
-	// Worker Loader for plugin sandboxing
-	"worker_loaders": [
-		{
-			"binding": "LOADER",
-		},
-	],
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-emdash-site",
+  "main": "./src/worker.ts",
+
+  "compatibility_date": "2026-02-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-emdash-site",
+      "database_id": "91b0abe4-99ff-402d-9e58-fe0f36f91cf9",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "my-emdash-media",
+      "preview_bucket_name": "my-emdash-media",
+    },
+  ],
+  // Worker Loader for plugin sandboxing
+  "worker_loaders": [
+    {
+      "binding": "LOADER",
+    },
+  ],
+  // Self service binding — bypasses Cloudflare's same-zone fetch
+  // loop protection (error 1042) so SSR pages can call internal
+  // EmDash plugin routes (e.g. forms-plugin definition endpoint).
+  "services": [
+    {
+      "binding": "SELF",
+      "service": "my-emdash-site",
+    },
+  ],
 }

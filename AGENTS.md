@@ -29,6 +29,28 @@ Agent skills are in `.agents/skills/`. Load them when working on specific tasks:
 - **creating-plugins** -- Building EmDash plugins with hooks, storage, admin UI, API routes, and Portable Text block types.
 - **emdash-cli** -- CLI commands for content management, seeding, type generation, and visual editing flow.
 
+## Documentation
+
+The EmDash docs are available as an MCP server at `https://docs.emdashcms.com/mcp`. When you need to verify an API, hook, config option, field type, or pattern, call `search_docs` against the live documentation rather than relying on training-data recall. The docs reflect current behaviour; assumptions may not.
+
+This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json` so Claude Code, Cursor, and VS Code auto-discover the docs server. Other tools (OpenCode, Windsurf, etc.) need a manual one-time setup -- see [docs.emdashcms.com/docs-mcp](https://docs.emdashcms.com/docs-mcp).
+
+## Private Projects
+
+Projects with `private: true` in the CMS gate the content section behind a password/request-access dialog. The rest of the page (hero, metadata, tagline) remains public.
+
+**Required secrets** — set in `.env` for local Node dev, `.dev.vars` for `wrangler dev`, and via `npx wrangler secret put` in production:
+
+| Secret | Description |
+| -------------------------------- | ---------------------------------------------------------------- |
+| `PRIVATE_ACCESS_PASSWORD` | Password shared out-of-band with approved visitors |
+| `PRIVATE_ACCESS_SECRET` | Random 32+ byte base64 string used to sign the `project_access_token` cookie — generate with `openssl rand -base64 32` |
+| `ACCESS_REQUEST_WEBHOOK_URL` | Discord / Slack webhook URL for access request notifications |
+
+**Magic link:** `GET /api/unlock?token=<password>&from=<slug>` sets the cookie and redirects to the project — handy for DMing visitors a one-click unlock.
+
+**CMS admin setup:** Create a form with slug `request-access` (fields: name, email, optional message) and set its webhook URL to `/api/notify-access-request`.
+
 ## Rules
 
 - All content pages must be server-rendered (`output: "server"`). No `getStaticPaths()` for CMS content.

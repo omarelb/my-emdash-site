@@ -1,30 +1,30 @@
 import type { APIRoute } from "astro";
 import { getEmDashCollection, getSiteSettings } from "emdash";
 
-import { resolveBlogSiteIdentity } from "../utils/site-identity";
-
 export const GET: APIRoute = async ({ site, url }) => {
 	const siteUrl = site?.toString() || url.origin;
-	const { siteTitle, siteTagline } = resolveBlogSiteIdentity(await getSiteSettings());
+	const settings = await getSiteSettings();
+	const siteTitle = settings?.title || "Studio";
+	const siteDescription = settings?.tagline || "Design & Development";
 
-	const { entries: posts } = await getEmDashCollection("posts", {
+	const { entries: projects } = await getEmDashCollection("projects", {
 		orderBy: { published_at: "desc" },
 		limit: 20,
 	});
 
-	const items = posts
-		.map((post) => {
-			if (!post.data.publishedAt) return null;
-			const pubDate = post.data.publishedAt.toUTCString();
+	const items = projects
+		.map((project) => {
+			if (!project.data.publishedAt) return null;
+			const pubDate = project.data.publishedAt.toUTCString();
 
-			const postUrl = `${siteUrl}/posts/${post.id}`;
-			const title = escapeXml(post.data.title || "Untitled");
-			const description = escapeXml(post.data.excerpt || "");
+			const projectUrl = `${siteUrl}/work/${project.id}`;
+			const title = escapeXml(project.data.title || "Untitled");
+			const description = escapeXml(project.data.summary || "");
 
 			return `    <item>
       <title>${title}</title>
-      <link>${postUrl}</link>
-      <guid isPermaLink="true">${postUrl}</guid>
+      <link>${projectUrl}</link>
+      <guid isPermaLink="true">${projectUrl}</guid>
       <pubDate>${pubDate}</pubDate>
       <description>${description}</description>
     </item>`;
@@ -36,7 +36,7 @@ export const GET: APIRoute = async ({ site, url }) => {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(siteTitle)}</title>
-    <description>${escapeXml(siteTagline)}</description>
+    <description>${escapeXml(siteDescription)}</description>
     <link>${siteUrl}</link>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
     <language>en-us</language>

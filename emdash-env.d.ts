@@ -5,26 +5,55 @@
 
 import type { ContentBylineCredit, PortableTextBlock } from "emdash";
 
-export interface Page {
+export interface HomePageSettings {
   id: string;
   slug: string | null;
   status: string;
-  title: string;
-  content?: PortableTextBlock[];
+  site_name?: string;
+  hero_heading?: string;
+  hero_subheading?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
   bylines?: ContentBylineCredit[];
 }
 
-export interface Post {
+export interface Page {
   id: string;
   slug: string | null;
   status: string;
   title: string;
-  featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
   content?: PortableTextBlock[];
-  excerpt?: string;
+  page_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
+  cv_url?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  bylines?: ContentBylineCredit[];
+}
+
+export interface Project {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  featured_image: { id: string; src?: string; alt?: string; width?: number; height?: number };
+  client?: string;
+  team?: string;
+  role?: string;
+  design_tools?: string;
+  description?: string;
+  project_tagline?: string;
+  priority?: number;
+  home_overlay_text?: string;
+  home_text_light?: boolean;
+  year?: string;
+  summary?: string;
+  content?: PortableTextBlock[];
+  work_caption?: string;
+  gallery?: unknown;
+  url?: string;
+  private?: boolean;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -33,7 +62,8 @@ export interface Post {
 
 declare module "emdash" {
   interface EmDashCollections {
+    home_settings: HomePageSettings;
     pages: Page;
-    posts: Post;
+    projects: Project;
   }
 }

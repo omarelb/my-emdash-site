@@ -1,0 +1,163 @@
+---
+import { getEmDashEntry } from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../layouts/Base.astro";
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", "about");
+if (!page) return Astro.redirect("/");
+
+Astro.cache.set(cacheHint);
+
+const cvUrl = (page.data.cv_url as string | undefined) || "";
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop";
+---
+
+<Base title="About">
+	<div class="about-page">
+		<!-- Two-column row: image left, description right -->
+		<div class="about-row">
+			<div class="about-image-wrap">
+				{page.data.page_image
+					? <Image image={page.data.page_image} class="about-img" />
+					: <img src={FALLBACK_IMAGE} alt="About" class="about-img" />
+				}
+			</div>
+
+			<div class="about-content">
+				<p class="about-heading">Hello again.</p>
+				{page.data.content && (
+					<div class="about-body">
+						<PortableText value={page.data.content} />
+					</div>
+				)}
+			</div>
+		</div>
+
+		<!-- CV link -->
+		<div class="cv-wrap">
+			{cvUrl
+				? <a href={cvUrl} target="_blank" rel="noopener noreferrer" class="cv-link">
+					View my CV
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</a>
+				: <span class="cv-link cv-link--placeholder">
+					View my CV
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M5 12h14M12 5l7 7-7 7" />
+					</svg>
+				</span>
+			}
+		</div>
+	</div>
+</Base>
+
+<style>
+	.about-page {
+		padding: 0 var(--page-padding);
+	}
+
+	/* ── Two-column row: image left, text right ── */
+	.about-row {
+		display: grid;
+		grid-template-columns: 500px 1fr;
+		gap: 60px;
+		align-items: start;
+	}
+
+	.about-image-wrap {
+		overflow: hidden;
+	}
+
+	.about-image-wrap img {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	/* ── Description column ── */
+	.about-content {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.about-heading {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	/* PortableText outputs <p> tags for each normal block */
+	.about-body :global(p) {
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 1.6;
+		letter-spacing: 0;
+		color: var(--color-text);
+		margin-bottom: 20px;
+	}
+
+	.about-body :global(p:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* ── CV link ── */
+	.cv-wrap {
+		margin-top: 60px;
+		margin-bottom: 250px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.cv-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-family: var(--font-inter), Inter, sans-serif;
+		font-weight: 400;
+		font-size: 20px;
+		line-height: 1;
+		letter-spacing: 0;
+		text-decoration: none;
+		color: var(--color-text);
+	}
+
+	.cv-link:hover {
+		opacity: 0.7;
+	}
+
+	.cv-link:active {
+		opacity: 0.45;
+	}
+
+	.cv-link--placeholder {
+		opacity: 0.3;
+		cursor: default;
+	}
+
+	/* ── Responsive ── */
+	@media (max-width: 900px) {
+		.about-row {
+			/* Stack: image on top, content below */
+			grid-template-columns: 1fr;
+			gap: 40px;
+		}
+
+		.about-image-wrap {
+			max-width: 500px;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.cv-wrap {
+			margin-top: 48px;
+			margin-bottom: 120px;
+		}
+	}
+</style>

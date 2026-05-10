@@ -1,938 +1,984 @@
 {
-	"$schema": "https://emdashcms.com/seed.schema.json",
-	"version": "1",
-	"meta": {
-		"name": "Blog Starter",
-		"description": "A blog with posts and pages",
-		"author": "EmDash"
-	},
-	"settings": {
-		"title": "My Blog",
-		"tagline": "Thoughts on building for the web"
-	},
-	"collections": [
-		{
-			"slug": "posts",
-			"label": "Posts",
-			"labelSingular": "Post",
-			"supports": ["drafts", "revisions", "search", "seo"],
-			"commentsEnabled": true,
-			"fields": [
-				{
-					"slug": "title",
-					"label": "Title",
-					"type": "string",
-					"required": true,
-					"searchable": true
-				},
-				{
-					"slug": "featured_image",
-					"label": "Featured Image",
-					"type": "image"
-				},
-				{
-					"slug": "content",
-					"label": "Content",
-					"type": "portableText",
-					"searchable": true
-				},
-				{
-					"slug": "excerpt",
-					"label": "Excerpt",
-					"type": "text"
-				}
-			]
-		},
-		{
-			"slug": "pages",
-			"label": "Pages",
-			"labelSingular": "Page",
-			"supports": ["drafts", "revisions", "search"],
-			"fields": [
-				{
-					"slug": "title",
-					"label": "Title",
-					"type": "string",
-					"required": true,
-					"searchable": true
-				},
-				{
-					"slug": "content",
-					"label": "Content",
-					"type": "portableText",
-					"searchable": true
-				}
-			]
-		}
-	],
-	"taxonomies": [
-		{
-			"name": "category",
-			"label": "Categories",
-			"labelSingular": "Category",
-			"hierarchical": true,
-			"collections": ["posts"],
-			"terms": [
-				{
-					"slug": "development",
-					"label": "Development"
-				},
-				{
-					"slug": "design",
-					"label": "Design"
-				},
-				{
-					"slug": "notes",
-					"label": "Notes"
-				}
-			]
-		},
-		{
-			"name": "tag",
-			"label": "Tags",
-			"labelSingular": "Tag",
-			"hierarchical": false,
-			"collections": ["posts"],
-			"terms": [
-				{
-					"slug": "webdev",
-					"label": "Web Development"
-				},
-				{
-					"slug": "opinion",
-					"label": "Opinion"
-				},
-				{
-					"slug": "tools",
-					"label": "Tools"
-				},
-				{
-					"slug": "creativity",
-					"label": "Creativity"
-				}
-			]
-		}
-	],
-	"bylines": [
-		{
-			"id": "byline-editorial",
-			"slug": "emdash-editorial",
-			"displayName": "EmDash Editorial"
-		},
-		{
-			"id": "byline-guest",
-			"slug": "guest-contributor",
-			"displayName": "Guest Contributor",
-			"isGuest": true
-		}
-	],
-	"menus": [
-		{
-			"name": "primary",
-			"label": "Primary Navigation",
-			"items": [
-				{
-					"type": "custom",
-					"label": "Home",
-					"url": "/"
-				},
-				{
-					"type": "custom",
-					"label": "About",
-					"url": "/pages/about"
-				},
-				{
-					"type": "custom",
-					"label": "Posts",
-					"url": "/posts"
-				}
-			]
-		}
-	],
-	"widgetAreas": [
-		{
-			"name": "sidebar",
-			"label": "Sidebar",
-			"description": "Widget area displayed on single post pages",
-			"widgets": [
-				{
-					"type": "component",
-					"componentId": "core:search",
-					"title": "Search"
-				},
-				{
-					"type": "component",
-					"componentId": "core:categories",
-					"title": "Categories"
-				},
-				{
-					"type": "component",
-					"componentId": "core:tags",
-					"title": "Tags"
-				},
-				{
-					"type": "component",
-					"componentId": "core:recent-posts",
-					"title": "Recent Posts",
-					"settings": {
-						"count": 5,
-						"showDate": true
-					}
-				},
-				{
-					"type": "component",
-					"componentId": "core:archives",
-					"title": "Archives",
-					"settings": {
-						"type": "monthly",
-						"limit": 6
-					}
-				}
-			]
-		},
-		{
-			"name": "footer",
-			"label": "Footer",
-			"description": "Widget area displayed in the site footer",
-			"widgets": [
-				{
-					"type": "content",
-					"title": "About",
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "A blog about software, design, and the occasional stray thought.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						}
-					]
-				}
-			]
-		}
-	],
-	"sections": [
-		{
-			"slug": "newsletter-signup",
-			"title": "Newsletter Signup",
-			"description": "A call-to-action block for newsletter subscriptions",
-			"keywords": ["newsletter", "subscribe", "email", "cta"],
-			"source": "theme",
-			"content": [
-				{
-					"_type": "block",
-					"style": "h3",
-					"children": [
-						{
-							"_type": "span",
-							"text": "Stay in the loop",
-							"_key": "k1"
-						}
-					],
-					"_key": "k0"
-				},
-				{
-					"_type": "block",
-					"style": "normal",
-					"children": [
-						{
-							"_type": "span",
-							"text": "Get notified when new posts are published. No spam, unsubscribe anytime.",
-							"_key": "k3"
-						}
-					],
-					"_key": "k2"
-				}
-			]
-		},
-		{
-			"slug": "about-author",
-			"title": "About the Author",
-			"description": "Brief author bio for use in posts or pages",
-			"keywords": ["author", "bio", "about"],
-			"source": "theme",
-			"content": [
-				{
-					"_type": "block",
-					"style": "normal",
-					"children": [
-						{
-							"_type": "span",
-							"text": "A software developer who writes about building things on the web. Based somewhere with good coffee and reliable internet.",
-							"_key": "k1"
-						}
-					],
-					"_key": "k0"
-				}
-			]
-		}
-	],
-	"content": {
-		"pages": [
-			{
-				"id": "about",
-				"slug": "about",
-				"status": "published",
-				"data": {
-					"title": "About",
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "A place for writing about software, design, and the occasional stray thought. No posting schedule, no newsletter funnel. Just things I wanted to write down.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Built with Astro and EmDash. The source is open if you want to see how it works.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						}
-					]
-				}
-			}
-		],
-		"posts": [
-			{
-				"id": "post-1",
-				"slug": "building-for-the-long-term",
-				"status": "published",
-				"data": {
-					"title": "Building for the Long Term",
-					"excerpt": "The frameworks will change. The databases will change. What survives is the clarity of your thinking.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=800&fit=crop",
-							"alt": "Code on a monitor in a dark room",
-							"filename": "building-long-term.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Every few years the industry collectively decides that everything we've been doing is wrong and there's a better way. New frameworks, new paradigms, new build tools. The churn is relentless, and if you're not careful, you spend more time migrating than building.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I've been writing software long enough to have seen several of these cycles. jQuery to Backbone to Angular to React to whatever comes next. Each transition felt urgent at the time. Looking back, the things that actually mattered were rarely about the framework.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "What survives",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Clean data models survive. Clear boundaries between systems survive. Good naming survives. The decision to keep things simple when you could have made them clever - that definitely survives.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "What doesn't survive is code that was written to impress, abstractions built for problems that never materialized, and architectures designed around a framework's opinions rather than the domain's reality.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The best code I've written is boring. It reads like prose, does one thing well, and doesn't require a PhD in category theory to understand. The worst code I've written was technically impressive at the time.",
-									"_key": "k11"
-								}
-							],
-							"_key": "k10"
-						}
-					]
-				},
-				"bylines": [
-					{
-						"byline": "byline-editorial"
-					},
-					{
-						"byline": "byline-guest",
-						"roleLabel": "Guest essay"
-					}
-				],
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-2",
-				"slug": "the-case-for-static",
-				"status": "published",
-				"data": {
-					"title": "The Case for Static",
-					"excerpt": "Static sites aren't a step backwards. They're what you get when you take performance and simplicity seriously.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&h=800&fit=crop",
-							"alt": "Laptop and coffee on a wooden table",
-							"filename": "case-for-static.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "There's a certain irony in the fact that the web started static, went dynamic, and is now swinging back toward static again. But the static sites of today aren't the hand-coded HTML pages of 1998. They're generated, optimized, and deployed to edge networks that serve them in milliseconds.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The pitch for server-rendered everything was compelling: dynamic content, personalization, real-time data. But most sites don't need most of that most of the time. A blog post doesn't need to be rendered on every request. A product page doesn't change every second.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The performance argument",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "A static file served from a CDN is as fast as the web gets. No cold starts, no database queries, no server-side rendering overhead. The Time to First Byte is essentially the network latency to your nearest edge node. You can't beat physics.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "And when you do need dynamic behavior, you can add it surgically. An island of interactivity in a sea of static HTML. The best of both worlds, without paying the cost of either at all times.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"bylines": [
-					{
-						"byline": "byline-editorial"
-					}
-				],
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["webdev", "opinion"]
-				}
-			},
-			{
-				"id": "post-3",
-				"slug": "learning-in-public",
-				"status": "published",
-				"data": {
-					"title": "Learning in Public",
-					"excerpt": "Writing about what you're learning is the fastest way to find out what you don't actually understand.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=1200&h=800&fit=crop",
-							"alt": "Notebook and pen on a desk",
-							"filename": "learning-in-public.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I started writing about things I was learning not because I had anything original to say, but because I kept forgetting what I'd figured out. The blog posts were notes to my future self, published publicly more out of laziness than courage.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "What I didn't expect was how much the writing itself would accelerate the learning. There's a particular kind of clarity that comes from trying to explain something to someone else. The gaps in your understanding, which you can happily ignore when the knowledge lives only in your head, become painfully obvious when you try to put it into sentences.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The fear of being wrong",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The biggest barrier isn't time or writing skill. It's the fear of publishing something that turns out to be wrong. But here's the thing: being wrong publicly is one of the most efficient ways to learn. Someone will correct you, often kindly, and you'll remember that correction forever.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The posts that helped me most weren't written by experts. They were written by people one step ahead of me on the same path, in language that hadn't yet been polished into abstraction. There's a place for that kind of writing, and it's more valuable than most people realize.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-4",
-				"slug": "small-tools-big-impact",
-				"status": "published",
-				"data": {
-					"title": "Small Tools, Big Impact",
-					"excerpt": "The best developer tools do one thing well and get out of your way. A love letter to focused software.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1575026615908-666710ae5e47?w=1200&h=800&fit=crop",
-							"alt": "Wrenches and hand tools hanging on a workshop wall",
-							"filename": "small-tools.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "There's a class of software that doesn't get enough appreciation. Not the frameworks or the platforms or the IDEs, but the small, sharp tools that solve one problem so well you stop thinking about them. They become invisible, which is the highest compliment you can pay a tool.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I'm talking about things like ripgrep, which searches code so fast it changed how I think about searching. Or jq, which makes JSON feel like a first-class data format in the terminal. Or curl, which has been quietly powering the internet's plumbing for decades.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The Unix philosophy, revisited",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Do one thing well. The advice is old enough to be a cliche, but the best modern tools still follow it. They don't try to be platforms. They don't have plugin ecosystems or configuration languages or startup wizards. They do their job and they compose with other tools that do theirs.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The temptation is always to add more. One more feature, one more option, one more integration. But every addition is a decision someone has to make, a path through the code that has to be maintained, a thing that can break. The best tools resist this. They stay small, and in staying small, they stay reliable.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["tools"]
-				}
-			},
-			{
-				"id": "post-5",
-				"slug": "designing-with-constraints",
-				"status": "published",
-				"data": {
-					"title": "Designing with Constraints",
-					"excerpt": "Limitations aren't obstacles to creativity. They're the structure that makes creativity possible.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=1200&h=800&fit=crop",
-							"alt": "Pencils and design tools on a desk",
-							"filename": "designing-with-constraints.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Give a designer a blank canvas and unlimited time, and they'll often produce something mediocre. Give them a tight brief, a small screen, and a deadline, and they'll surprise you. This isn't a paradox - it's how creativity actually works.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Constraints force decisions. When you can't use more than two typefaces, you have to choose carefully. When the page has to load in under a second, every element earns its place. When the interface has to work on a 320px screen, you discover what's truly essential.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Embracing the box",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The web itself is a constraint. HTML flows in one direction. CSS has a box model. Browsers have viewport sizes and font rendering quirks. You can fight these constraints or you can work with them, and the results are dramatically different.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The designs I admire most don't look like they were forced through a framework. They look like they grew naturally from the medium, respecting its grain rather than working against it. That only happens when you treat constraints as creative partners rather than enemies.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["design"],
-					"tag": ["creativity"]
-				}
-			},
-			{
-				"id": "post-6",
-				"slug": "a-weekend-with-a-side-project",
-				"status": "published",
-				"data": {
-					"title": "A Weekend with a Side Project",
-					"excerpt": "No stakeholders, no deadlines, no Jira tickets. Just you and a dumb idea that might turn into something.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&h=800&fit=crop",
-							"alt": "Code on a screen with a dark theme",
-							"filename": "weekend-side-project.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Saturday morning. Coffee's made, the house is quiet, and I've got an idea that's been nagging at me all week. Not a good idea, necessarily - just a persistent one. A small tool that does a thing I keep doing manually. How hard could it be?",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "This is the best kind of programming. No requirements document, no sprint planning, no pull request reviews. Just a text editor and a problem. The freedom to make terrible architectural decisions, rewrite everything twice, and follow tangents that turn out to be dead ends.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Why side projects matter",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Side projects are where you learn things your day job would never teach you. Not because the problems are harder, but because you're free to take risks. Try a language you've never used. Build something without a framework. Deploy to a platform you've only read about. The stakes are zero, which makes the learning maximum.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "By Sunday evening, the thing sort of works. It's rough, the error handling is nonexistent, and the README is a single sentence. But it solves the problem I set out to solve, and I learned three things I didn't know on Friday. Not a bad weekend.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["creativity"]
-				}
-			},
-			{
-				"id": "post-7",
-				"slug": "notes-on-simplicity",
-				"status": "published",
-				"data": {
-					"title": "Notes on Simplicity",
-					"excerpt": "Simplicity isn't the absence of complexity. It's the result of understanding a problem well enough to solve it cleanly.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1559051668-e1fa58f25786?w=1200&h=800&fit=crop",
-							"alt": "Geometric pattern carved into white paper",
-							"filename": "notes-on-simplicity.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Every piece of software starts simple. A few files, a clear purpose, a small surface area. Then features get added, edge cases get handled, and before long you're looking at something that requires a diagram to understand. This isn't inevitable, but it takes discipline to prevent.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The hard part of simplicity isn't the initial design. It's the ongoing resistance to complication. Every feature request, every bug fix, every refactor is an opportunity to add complexity. Saying no is the most important design skill, and the least celebrated.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Removing as a feature",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The best version of a product often has fewer features than the previous one. Not because features were missing, but because someone had the courage to remove things that weren't earning their keep. Every feature has a cost - in maintenance, in cognitive load, in the weight of the interface.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Simplicity is a practice, not a destination. You never arrive at simple. You just keep asking: is this necessary? Could this be clearer? Is there a way to solve this problem by removing something instead of adding something? The answer is yes more often than you'd expect.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-draft",
-				"slug": "work-in-progress",
-				"status": "draft",
-				"data": {
-					"title": "Work in Progress",
-					"excerpt": "This post is still being written.",
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "This is a draft post that won't appear in the public listing.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						}
-					]
-				}
-			}
-		]
-	}
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "meta": {
+    "name": "Portfolio Starter",
+    "description": "A portfolio for showcasing creative work",
+    "author": "EmDash"
+  },
+  "settings": {
+    "title": "Studio",
+    "tagline": "Design & Development"
+  },
+  "collections": [
+    {
+      "slug": "home_settings",
+      "label": "Home Page Settings",
+      "labelSingular": "Home Page Settings",
+      "supports": [],
+      "fields": [
+        {
+          "slug": "site_name",
+          "label": "Site Name (shown in header)",
+          "type": "string"
+        },
+        {
+          "slug": "hero_heading",
+          "label": "Hero Heading",
+          "type": "string"
+        },
+        {
+          "slug": "hero_subheading",
+          "label": "Hero Subheading",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "slug": "projects",
+      "label": "Projects",
+      "labelSingular": "Project",
+      "supports": ["drafts", "revisions", "search", "seo"],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "featured_image",
+          "label": "Featured Image",
+          "type": "image",
+          "required": true
+        },
+        {
+          "slug": "client",
+          "label": "Client",
+          "type": "string"
+        },
+        {
+          "slug": "team",
+          "label": "Team",
+          "type": "string"
+        },
+        {
+          "slug": "role",
+          "label": "Role",
+          "type": "string"
+        },
+        {
+          "slug": "design_tools",
+          "label": "Design Tools",
+          "type": "string"
+        },
+        {
+          "slug": "description",
+          "label": "Project Description",
+          "type": "text",
+          "searchable": true
+        },
+        {
+          "slug": "project_tagline",
+          "label": "Project Tagline",
+          "type": "string"
+        },
+        {
+          "slug": "priority",
+          "label": "Priority (higher = shown first on home page)",
+          "type": "integer"
+        },
+        {
+          "slug": "home_overlay_text",
+          "label": "Home Page Overlay Text",
+          "type": "text"
+        },
+        {
+          "slug": "home_text_light",
+          "label": "Use Light Text on Home Image",
+          "type": "boolean"
+        },
+        {
+          "slug": "year",
+          "label": "Year",
+          "type": "string"
+        },
+        {
+          "slug": "summary",
+          "label": "Summary",
+          "type": "text",
+          "searchable": true
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "searchable": true
+        },
+        {
+          "slug": "work_caption",
+          "label": "Work Grid Caption",
+          "type": "string"
+        },
+        {
+          "slug": "gallery",
+          "label": "Gallery",
+          "type": "json"
+        },
+        {
+          "slug": "url",
+          "label": "Project URL",
+          "type": "string"
+        },
+        {
+          "slug": "private",
+          "type": "boolean",
+          "label": "Private",
+          "description": "When on, the project content section is gated behind the request-access flow."
+        }
+      ]
+    },
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": ["drafts", "revisions", "search"],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "searchable": true
+        },
+        {
+          "slug": "page_image",
+          "label": "Page Image",
+          "type": "image"
+        },
+        {
+          "slug": "cv_url",
+          "label": "CV / Resume (URL to PDF)",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "taxonomies": [
+    {
+      "name": "category",
+      "label": "Categories",
+      "labelSingular": "Category",
+      "hierarchical": false,
+      "collections": ["projects"],
+      "terms": [
+        {
+          "slug": "branding",
+          "label": "Branding"
+        },
+        {
+          "slug": "web",
+          "label": "Web Design"
+        },
+        {
+          "slug": "print",
+          "label": "Print"
+        },
+        {
+          "slug": "photography",
+          "label": "Photography"
+        }
+      ]
+    },
+    {
+      "name": "tag",
+      "label": "Tags",
+      "labelSingular": "Tag",
+      "hierarchical": false,
+      "collections": ["projects"],
+      "terms": [
+        {
+          "slug": "identity",
+          "label": "Identity"
+        },
+        {
+          "slug": "ui-ux",
+          "label": "UI/UX"
+        },
+        {
+          "slug": "development",
+          "label": "Development"
+        },
+        {
+          "slug": "art-direction",
+          "label": "Art Direction"
+        },
+        {
+          "slug": "packaging",
+          "label": "Packaging"
+        },
+        {
+          "slug": "ecommerce",
+          "label": "E-commerce"
+        },
+        {
+          "slug": "editorial",
+          "label": "Editorial"
+        }
+      ]
+    },
+    {
+      "name": "work_type",
+      "label": "Work Types",
+      "labelSingular": "Work Type",
+      "hierarchical": false,
+      "collections": ["projects"],
+      "terms": [
+        {
+          "slug": "concept-design",
+          "label": "Concept Design"
+        },
+        {
+          "slug": "cmf",
+          "label": "CMF"
+        },
+        {
+          "slug": "user-research",
+          "label": "User Research"
+        },
+        {
+          "slug": "3d-rendering",
+          "label": "3D Rendering"
+        },
+        {
+          "slug": "cad",
+          "label": "CAD"
+        }
+      ]
+    }
+  ],
+  "menus": [
+    {
+      "name": "primary",
+      "label": "Primary Navigation",
+      "items": [
+        {
+          "type": "custom",
+          "label": "Home",
+          "url": "/"
+        },
+        {
+          "type": "custom",
+          "label": "About",
+          "url": "/about"
+        },
+        {
+          "type": "custom",
+          "label": "Work",
+          "url": "/work"
+        },
+        {
+          "type": "custom",
+          "label": "Contact",
+          "url": "/contact"
+        }
+      ]
+    }
+  ],
+  "content": {
+    "home_settings": [
+      {
+        "id": "home",
+        "slug": "home",
+        "status": "published",
+        "data": {
+          "site_name": "Josephine Leong",
+          "hero_heading": "Hello, I'm Josephine.",
+          "hero_subheading": "An industrial + CMF designer with a mechanical engineering background. I enjoy creating experiences that are fun, meaningful and user-centred."
+        }
+      }
+    ],
+    "pages": [
+      {
+        "id": "about",
+        "slug": "about",
+        "status": "published",
+        "data": {
+          "title": "Hello again.",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "a0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "a1",
+                  "text": "I'm Josephine, an industrial and CMF designer with a mechanical engineering background based in the Netherlands. I believe great design lives at the intersection of function, material, and meaning."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "a2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "a3",
+                  "text": "My work spans concept design, CMF strategy, user research, and 3D visualisation. I enjoy working on projects where the physical and experiential qualities of a product are just as important as its technical performance."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "a4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "a5",
+                  "text": "Previously I've worked on urban furniture, consumer electronics, and sustainable mobility. I'm currently open to new opportunities \u2014 feel free to reach out."
+                }
+              ]
+            }
+          ],
+          "page_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop",
+              "alt": "Josephine Leong, designer",
+              "filename": "about-photo.jpg"
+            }
+          },
+          "cv_url": ""
+        }
+      }
+    ],
+    "projects": [
+      {
+        "id": "energy-tree",
+        "slug": "energy-tree",
+        "status": "published",
+        "data": {
+          "title": "Energy Tree",
+          "client": "Municipality of Dordrecht",
+          "year": "2024",
+          "work_caption": "Urban furniture concept for the 2030 energy transition",
+          "team": "Josephine Leong",
+          "role": "Concept & CMF Designer",
+          "design_tools": "Figma, Rhino, KeyShot",
+          "summary": "Urban furniture concept designed to make the 2030 energy transition visible and participatory for citizens of Dordrecht.",
+          "description": "Energy Tree is a solar-powered urban furniture concept that turns passive street infrastructure into an active touchpoint in Dordrecht\u2019s sustainability story. Positioned at key pedestrian intersections, each unit harvests solar energy through an overhead canopy of photovoltaic panels shaped to evoke a tree canopy. USB charging ports and ambient LED lighting make the benefits of renewable energy immediately tangible to passersby, while a small display shows real-time energy generation data. The CMF strategy pairs powder-coated COR-TEN steel with recycled-content polycarbonate diffusers, giving the piece a warm, civic character that ages gracefully in a public setting.",
+          "project_tagline": "ENERGY TREE \u2014 URBAN FURNITURE CONCEPT \u2014 ENCOURAGING BEHAVIOUR CHANGE TOWARDS A GREENER LIFESTYLE",
+          "priority": 10,
+          "home_overlay_text": "ENERGY TREE\nUrban furniture concept design to promote the 2030 energy transition in Dordrecht",
+          "home_text_light": true,
+          "featured_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&fit=crop",
+              "alt": "Energy Tree concept",
+              "filename": "energy-tree-hero.jpg"
+            }
+          },
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "et_db_h",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et_db_hs",
+                  "text": "Design Brief"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "et_db_p",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et_db_ps",
+                  "text": "The Municipality of Dordrecht commissioned a concept for urban furniture that would make the 2030 energy transition legible and engaging at street level. The brief called for a piece that generates renewable energy, provides a public amenity, and opens a conversation about sustainable urban living \u2014 without resorting to didactic signage or green-washing aesthetics. The design needed to integrate into the existing streetscape language while standing out enough to invite curiosity."
+                }
+              ]
+            },
+            {
+              "_type": "image",
+              "_key": "et_img1",
+              "asset": {
+                "_ref": "et_img1",
+                "url": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1200&h=800&fit=crop"
+              },
+              "alt": "Energy Tree \u2014 solar canopy detail",
+              "width": 1200,
+              "height": 800
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "et0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et1",
+                  "text": "The starting point was a simple question: what does the energy transition feel like at human scale? Most sustainability infrastructure \u2014 wind turbines, solar farms \u2014 operates at a distance from everyday life. Energy Tree was designed to close that gap."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "et2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et3",
+                  "text": "Research & Context"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "et4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et5",
+                  "text": "Field research in Dordrecht revealed that residents understood the importance of the energy transition intellectually but felt disconnected from its progress. Interviews surfaced a consistent theme: people wanted to see and feel a contribution, not just read about targets. This shaped the core design principle \u2014 make energy generation immediate and personal."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "et6",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et7",
+                  "text": "CMF & Detail"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "et8",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "et9",
+                  "text": "The canopy structure uses a modular array of bifacial solar cells mounted in polycarbonate housings. COR-TEN steel was chosen for the primary structure for its self-healing patina \u2014 a material that visibly ages alongside the city. At night, harvested energy powers warm-white ambient lighting beneath the canopy, transforming the piece into a quiet lantern."
+                }
+              ]
+            }
+          ]
+        },
+        "taxonomies": {
+          "work_type": ["concept-design", "cmf", "3d-rendering"]
+        }
+      },
+      {
+        "id": "meridian-brand",
+        "slug": "meridian-brand",
+        "status": "published",
+        "data": {
+          "title": "Meridian",
+          "client": "Meridian Collective",
+          "year": "2024",
+          "summary": "Complete visual identity system for Meridian Collective, a platform bridging contemporary art and emerging technology.",
+          "work_caption": "Brand identity for a creative collective",
+          "team": "Josephine Leong, Alex Kim",
+          "role": "Brand Designer",
+          "design_tools": "Figma, Illustrator",
+          "description": "Meridian Collective brings together artists and technologists for collaborative residencies and public programmes. The identity needed to hold two worlds in tension: the slow, material quality of studio practice and the fast, networked logic of digital culture. The solution centres on a custom wordmark where classical proportions meet a subtle optical illusion \u2014 the letterforms read differently depending on viewing distance, a metaphor for the Collective\u2019s dual audience. A restricted palette of warm off-white, deep ink, and a single iridescent accent carries across print, screen, and spatial applications.",
+          "project_tagline": "MERIDIAN \u2014 WHERE STUDIO PRACTICE MEETS DIGITAL CULTURE \u2014 AN IDENTITY IN TWO REGISTERS",
+          "priority": 5,
+          "home_overlay_text": "MERIDIAN\nBrand identity for a creative collective bringing together artists and technologists.",
+          "home_text_light": true,
+          "featured_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=1100&fit=crop",
+              "alt": "Meridian cover image",
+              "filename": "photo-1558618666-fcd25c85cd64.jpg"
+            }
+          },
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "mb_db_h",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb_db_hs",
+                  "text": "Design Brief"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "mb_db_p",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb_db_ps",
+                  "text": "Meridian Collective needed a visual identity flexible enough to live across gallery invitations, Instagram grids, exhibition catalogues, and digital interfaces \u2014 without feeling like it belonged to only one of those contexts. The brief specified no illustrative elements: typography and colour alone had to do all the work. The identity also needed to scale gracefully from a business card to a 6-metre exhibition banner."
+                }
+              ]
+            },
+            {
+              "_type": "image",
+              "_key": "mb_img1",
+              "asset": {
+                "_ref": "mb_img1",
+                "url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=800&fit=crop"
+              },
+              "alt": "Meridian brand applications",
+              "width": 1200,
+              "height": 800
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "mb0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb1",
+                  "text": "The Meridian brief arrived with a mood board that contained no images \u2014 only words. \u201cTimeless but not nostalgic. Digital but not cold. Collective but with a distinct voice.\u201d That tension became the brief."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "mb2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb3",
+                  "text": "Wordmark Development"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "mb4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb5",
+                  "text": "Over thirty wordmark explorations were reduced to three directions: a geometric sans, a modified classical serif, and a hybrid that drew from both. The hybrid won \u2014 its slightly flared terminals give warmth at small sizes while the strict cap-height geometry maintains authority at large scale."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "mb6",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb7",
+                  "text": "Colour & Application"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "mb8",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "mb9",
+                  "text": "The iridescent accent \u2014 a foil in print, a CSS gradient on screen \u2014 appears only on the most significant touchpoints: the cover of the annual programme, the header of the website, the stamp on exhibition collateral. Restraint makes each appearance feel deliberate."
+                }
+              ]
+            }
+          ]
+        },
+        "taxonomies": {
+          "category": ["branding"],
+          "tag": ["identity", "art-direction"],
+          "work_type": ["concept-design"]
+        }
+      },
+      {
+        "id": "volta-web",
+        "slug": "volta-web",
+        "status": "published",
+        "data": {
+          "title": "Volta",
+          "client": "Volta Energy",
+          "year": "2024",
+          "summary": "Website design and UX for Volta Energy, making residential solar accessible through clarity, trust, and a streamlined quote journey.",
+          "work_caption": "Website design for a renewable energy startup",
+          "team": "Josephine Leong",
+          "role": "UX & Visual Designer",
+          "design_tools": "Figma, Webflow",
+          "description": "Volta Energy\u2019s existing website buried the most important action \u2014 getting a quote \u2014 behind four pages of technical content. The redesign inverted that logic: the quote journey begins on the homepage, with educational content available as a secondary path for visitors who want to understand before they commit. A warm green and natural stone palette replaced the previous corporate blues, positioning Volta as a trusted neighbourhood company rather than a faceless utility. Every page was tested with first-time solar buyers to ensure the language stayed human.",
+          "project_tagline": "VOLTA \u2014 MAKING CLEAN ENERGY FEEL LIKE AN OBVIOUS CHOICE \u2014 DESIGN FOR TRUST AT SCALE",
+          "priority": 4,
+          "home_overlay_text": "VOLTA\nWebsite design for a renewable energy startup making clean power accessible to everyone.",
+          "home_text_light": true,
+          "featured_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=500&fit=crop",
+              "alt": "Volta cover image",
+              "filename": "photo-1497366216548-37526070297c.jpg"
+            }
+          },
+          "url": "https://volta.example.com",
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "vw_db_h",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw_db_hs",
+                  "text": "Design Brief"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "vw_db_p",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw_db_ps",
+                  "text": "Volta Energy had strong technology and competitive pricing but a website that its own sales team described as \"too engineering-focused.\" The brief asked for a redesign that would reduce the average time-to-quote from 6 minutes to under 2, increase conversion on mobile (where 68% of traffic arrived), and establish Volta as the most approachable brand in the Dutch residential solar market."
+                }
+              ]
+            },
+            {
+              "_type": "image",
+              "_key": "vw_img1",
+              "asset": {
+                "_ref": "vw_img1",
+                "url": "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1200&h=800&fit=crop"
+              },
+              "alt": "Volta website on screen",
+              "width": 1200,
+              "height": 800
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "vw0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw1",
+                  "text": "The first research session revealed the core problem: visitors arrived motivated but left confused. The existing site answered questions nobody had asked while leaving the obvious ones \u2014 \u201cHow much will it cost?\u201d and \u201cHow long does installation take?\u201d \u2014 buried in an FAQ accordion."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "vw2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw3",
+                  "text": "UX Strategy"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "vw4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw5",
+                  "text": "We mapped every question a first-time buyer has across a six-week consideration journey and structured the site architecture around those questions in chronological order. The homepage speaks to day-one curiosity. Product pages speak to week-two comparison. The quote flow speaks to week-six readiness."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "vw6",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw7",
+                  "text": "Visual Language"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "vw8",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "vw9",
+                  "text": "The green accent was derived from the specific wavelength of light that chlorophyll absorbs most efficiently \u2014 a nerdy detail that nobody notices consciously but that gives the colour an unusual naturalness. Paired with warm greige backgrounds and generous whitespace, it reads as calm and confident rather than aggressively ecological."
+                }
+              ]
+            }
+          ]
+        },
+        "taxonomies": {
+          "category": ["web"],
+          "tag": ["ui-ux", "development"],
+          "work_type": ["user-research", "concept-design"]
+        }
+      },
+      {
+        "id": "archive-print",
+        "slug": "archive-print",
+        "status": "published",
+        "data": {
+          "title": "The Archive",
+          "client": "City Museum",
+          "year": "2023",
+          "summary": "Print identity for The Archive \u2014 a 240-page exhibition catalogue and complete wayfinding system for a retrospective on 50 years of modernist architecture.",
+          "work_caption": "Exhibition catalog and print materials",
+          "team": "Josephine Leong, Maria Santos",
+          "role": "Print & Editorial Designer",
+          "design_tools": "InDesign, Illustrator",
+          "description": "The Archive retrospective brought together 200 works spanning five decades of modernist architecture from across Europe. The print identity had to honour the rigour of the subject without becoming a pastiche of mid-century graphic design. The catalogue uses a 12-column grid derived directly from the proportional system used by the exhibition\u2019s most represented architect, Aldo van Eyck. Full-bleed archival photographs alternate with dense analytical spreads, creating a rhythm that mirrors the experience of moving through the exhibition itself. The typeface pairing \u2014 a narrow grotesque for body text and a wide-tracked geometric for headings \u2014 evokes technical drawing conventions without literal mimicry.",
+          "project_tagline": "THE ARCHIVE \u2014 FIVE DECADES OF MODERNIST ARCHITECTURE \u2014 A RETROSPECTIVE IN PRINT",
+          "featured_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1000&fit=crop",
+              "alt": "The Archive cover image",
+              "filename": "photo-1507003211169-0a1dd7228f2d.jpg"
+            }
+          },
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "ap_db_h",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap_db_hs",
+                  "text": "Design Brief"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "ap_db_p",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap_db_ps",
+                  "text": "The City Museum required a complete print identity for The Archive: a 240-page hardcover catalogue, exhibition posters in three sizes, room-by-room wayfinding, and an accompanying zine for younger visitors. The catalogue needed to function both as an academic reference and as a desirable object in the museum shop. Budget constraints meant two-colour printing throughout, with the cover as the only four-colour exception."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "ap0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap1",
+                  "text": "Two-colour printing is not a limitation \u2014 it is a discipline. Every decision about what gets the second colour becomes a hierarchy decision. For The Archive, the second colour (a warm terracotta Pantone) was reserved for captions, section markers, and the architectural drawings. This single rule gave the entire catalogue its visual logic."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "ap2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap3",
+                  "text": "Grid System"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "ap4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap5",
+                  "text": "The 12-column grid accommodates three distinct page types: full-bleed image spreads, 50/50 image-text splits, and dense text pages with marginal annotations. Transitions between types were choreographed across the catalogue like chapters in a film edit \u2014 breathing room before density, density before revelation."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "ap6",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap7",
+                  "text": "Wayfinding"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "ap8",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "ap9",
+                  "text": "The exhibition wayfinding uses the same grid and typefaces as the catalogue, creating a visual continuity between the physical space and the printed object. Visitors who picked up the catalogue first could navigate the rooms with it; visitors who experienced the rooms first found the catalogue a familiar extension."
+                }
+              ]
+            }
+          ],
+          "priority": 3
+        },
+        "taxonomies": {
+          "category": ["print"],
+          "tag": ["editorial", "art-direction"],
+          "work_type": ["concept-design"]
+        }
+      },
+      {
+        "id": "coastal-photo",
+        "slug": "coastal-photo",
+        "status": "published",
+        "data": {
+          "title": "Coastal",
+          "client": "Personal Project",
+          "year": "2023",
+          "summary": "A year-long medium-format film series documenting the Pacific coastline at transitional light \u2014 dawn, dusk, and the hours in between.",
+          "work_caption": "Photographic study of the Pacific coastline",
+          "role": "Photographer",
+          "design_tools": "Mamiya 645, Lightroom",
+          "description": "Coastal began as a single weekend on the Oregon coast with a borrowed Mamiya 645 and ended twelve months later with 340 developed rolls and a shortlist of 48 images. The series is organised not by geography but by light condition: the blue hour before dawn, the hard side-light of morning, the flat midday diffusion, the golden collapse of late afternoon, and the long blue shadow of dusk. Within each condition, the Pacific reveals a different character \u2014 the same stretch of beach becomes five different places across a single day. The prints are made on a warm-tone fibre paper that holds shadow detail without sacrificing the luminosity of the horizon.",
+          "project_tagline": "COASTAL \u2014 A YEAR OF LIGHT ON THE PACIFIC EDGE \u2014 MEDIUM FORMAT FILM 2022\u20132023",
+          "featured_image": {
+            "$media": {
+              "url": "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=600&fit=crop",
+              "alt": "Coastal cover image",
+              "filename": "photo-1505142468610-359e7d316be0.jpg"
+            }
+          },
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "cp_db_h",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp_db_hs",
+                  "text": "Design Brief"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "cp_db_p",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp_db_ps",
+                  "text": "A self-initiated project with no client brief, which meant the brief had to be written retroactively from the work itself. After the first month of shooting it became clear that the project was not about the coast as a place but about the quality of attention that slow photography demands. The constraint: only shoot during the transitional hours. No midday frames. No artificial light. Every image had to be earned by being present at the right moment."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "cp0",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp1",
+                  "text": "Film slows you down in a way that nothing else does. You have 15 frames per roll, you know exactly how many you have left, and each one costs money and time to develop. That economy of attention changes how you see \u2014 or rather, it restores a kind of seeing that digital abundance has quietly eroded."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "cp2",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp3",
+                  "text": "Process"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "cp4",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp5",
+                  "text": "Each location was visited at least three times before any frames were exposed: once to understand the light, once to understand the tides, once to understand the people. By the time the camera came out, the image already existed \u2014 the shutter release was almost an afterthought."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "_key": "cp6",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp7",
+                  "text": "Editing & Sequencing"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "_key": "cp8",
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "cp9",
+                  "text": "The final sequence of 48 images was arrived at through six rounds of editing over four months. Images that were technically strong but emotionally neutral were cut. Images that were technically imperfect but held something \u2014 a quality of stillness, a particular quality of grey \u2014 stayed. The final sequence moves from dark to light and back to dark, a single day distilled from a year."
+                }
+              ]
+            }
+          ],
+          "priority": 2
+        },
+        "taxonomies": {
+          "category": ["photography"],
+          "tag": ["art-direction", "editorial"],
+          "work_type": ["concept-design", "cmf"]
+        }
+      }
+    ]
+  }
 }
