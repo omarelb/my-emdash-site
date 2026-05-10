@@ -25,4 +25,13 @@
       "binding": "LOADER",
     },
   ],
+  // Self service binding — bypasses Cloudflare's same-zone fetch
+  // loop protection (error 1042) so SSR pages can call internal
+  // EmDash plugin routes (e.g. forms-plugin definition endpoint).
+  "services": [
+    {
+      "binding": "SELF",
+      "service": "my-emdash-site",
+    },
+  ],
 }

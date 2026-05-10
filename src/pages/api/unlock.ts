@@ -24,7 +24,7 @@ export async function POST({ request, cookies, locals, redirect }: APIContext) {
 	const password = String(data.get("password") ?? "");
 	const from = safeSlug(String(data.get("from") ?? ""));
 
-	if (!verifyPassword(password, locals)) {
+	if (!(await verifyPassword(password, locals))) {
 		const dest = from ? `/projects/${from}?error=1` : "/work?error=1";
 		return redirect(dest);
 	}
@@ -39,7 +39,7 @@ export async function GET({ url, cookies, locals, redirect }: APIContext) {
 	const token = String(url.searchParams.get("token") ?? "");
 	const from = safeSlug(url.searchParams.get("from"));
 
-	if (!verifyPassword(token, locals)) {
+	if (!(await verifyPassword(token, locals))) {
 		return redirect("/work");
 	}
 

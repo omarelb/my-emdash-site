@@ -3,10 +3,18 @@ import type { AstroCookies } from "astro";
 const COOKIE_NAME = "project_access_token";
 const SIGNED_MESSAGE = "unlocked";
 
-function getRuntimeEnv(locals: App.Locals): Record<string, string | undefined> {
-	// Cloudflare Workers runtime (production)
-	const cfEnv = (locals as unknown as { runtime?: { env?: Record<string, string> } }).runtime?.env;
-	if (cfEnv) return cfEnv;
+async function getRuntimeEnv(_locals: App.Locals): Promise<Record<string, string | undefined>> {
+	// Cloudflare Workers runtime (production) — Astro v6 removed locals.runtime.env;
+	// import from cloudflare:workers instead. Dynamic import so local Node dev
+	// doesn't try to resolve the Workers-only module at build time.
+	try {
+		const mod = (await import(/* @vite-ignore */ "cloudflare:workers")) as {
+			env?: Record<string, string | undefined>;
+		};
+		if (mod?.env) return mod.env;
+	} catch {
+		// not running on Cloudflare — fall through
+	}
 	// Local Node dev — Vite loads .env files into import.meta.env
 	return import.meta.env as Record<string, string | undefined>;
 }
@@ -28,7 +36,7 @@ async function computeHmac(secret: string): Promise<string> {
 }
 
 export async function makeUnlockCookieValue(locals: App.Locals): Promise<string> {
-	const env = getRuntimeEnv(locals);
+	const env = await getRuntimeEnv(locals);
 	const secret = env.PRIVATE_ACCESS_SECRET ?? "";
 	return computeHmac(secret);
 }
@@ -40,8 +48,8 @@ export async function isUnlocked(cookies: AstroCookies, locals: App.Locals): Pro
 	return token === expected;
 }
 
-export function verifyPassword(submitted: string, locals: App.Locals): boolean {
-	const env = getRuntimeEnv(locals);
+export async function verifyPassword(submitted: string, locals: App.Locals): Promise<boolean> {
+	const env = await getRuntimeEnv(locals);
 	const password = env.PRIVATE_ACCESS_PASSWORD ?? "";
 	if (!password || !submitted) return false;
 	// Constant-time comparison to prevent timing attacks

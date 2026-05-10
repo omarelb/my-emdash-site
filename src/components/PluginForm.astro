@@ -54,7 +54,23 @@ interface Props {
 
 const { id } = Astro.props;
 
-const response = await fetch(
+// Cloudflare blocks workers from fetching their own hostname (error 1042).
+// Use the SELF service binding when available; fall back to global fetch in
+// local Node dev where the dynamic import resolves to nothing.
+async function selfFetch(input: URL, init: RequestInit): Promise<Response> {
+	try {
+		const mod = (await import(/* @vite-ignore */ "cloudflare:workers")) as {
+			env?: { SELF?: { fetch: (req: Request) => Promise<Response> } };
+		};
+		const self = mod?.env?.SELF;
+		if (self) return self.fetch(new Request(input.toString(), init));
+	} catch {
+		// Not on Cloudflare — fall through.
+	}
+	return fetch(input, init);
+}
+
+const response = await selfFetch(
 	new URL("/_emdash/api/plugins/emdash-forms/definition", Astro.url),
 	{
 		method: "POST",
@@ -65,7 +81,7 @@ const response = await fetch(
 
 if (!response.ok) return;
 
-// The API wraps the payload in { data: ... }
+// The plugin route wraps the payload in { data: ... }
 const json = (await response.json()) as { data?: FormDefinition } | FormDefinition;
 const form: FormDefinition | undefined =
 	json && "data" in json && json.data ? json.data : (json as FormDefinition);

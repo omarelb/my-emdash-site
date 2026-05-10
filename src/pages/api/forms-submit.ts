@@ -21,7 +21,20 @@ export async function POST({ request }: APIContext) {
 		body = await request.text();
 	}
 
-	const upstream = await fetch(
+	// Use the SELF service binding when on Cloudflare to avoid same-zone
+	// loop protection (error 1042) on loopback fetches.
+	async function selfFetch(input: URL, init: RequestInit): Promise<Response> {
+		try {
+			const mod = (await import(/* @vite-ignore */ "cloudflare:workers")) as {
+				env?: { SELF?: { fetch: (req: Request) => Promise<Response> } };
+			};
+			const self = mod?.env?.SELF;
+			if (self) return self.fetch(new Request(input.toString(), init));
+		} catch { /* not on Cloudflare */ }
+		return fetch(input, init);
+	}
+
+	const upstream = await selfFetch(
 		new URL("/_emdash/api/plugins/emdash-forms/submit", request.url),
 		{ method: "POST", headers, body },
 	);
