@@ -1,0 +1,16 @@
+diff --git a/src/astro/FormEmbed.astro b/src/astro/FormEmbed.astro
+index 38030c9b2fad82680473da7ffab9d94ee25358d0..7e488bbc769a0f200b964ff200c842c8b3b6ef0e 100644
+--- a/src/astro/FormEmbed.astro
++++ b/src/astro/FormEmbed.astro
+@@ -69,7 +69,10 @@ const response = await fetch(
+ 
+ if (!response.ok) return;
+ 
+-const form = (await response.json()) as FormDefinition;
++const payload = (await response.json()) as FormDefinition | { data: FormDefinition };
++const form = (payload && typeof payload === "object" && "data" in payload
++	? (payload as { data: FormDefinition }).data
++	: (payload as FormDefinition));
+ if (!form || form.status !== "active") return;
+ 
+ const submitUrl = `/_emdash/api/plugins/emdash-forms/submit`;

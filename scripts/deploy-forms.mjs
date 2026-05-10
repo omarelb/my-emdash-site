@@ -11,7 +11,7 @@
  * Skips forms whose slug already exists in production (no overwrite).
  */
 
-import Database from "better-sqlite3";
+import { execFileSync } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -26,15 +26,30 @@ if (!PROD_URL) {
   process.exit(1);
 }
 
-const db = new Database(DB_PATH, { readonly: true });
+// Read forms via the sqlite3 CLI to avoid a native dependency.
+// -separator '\x1f' (unit separator) isolates id from JSON data even if the
+// JSON contains tabs/newlines.
+const SEP = "\x1f";
+const out = execFileSync(
+  "sqlite3",
+  [
+    DB_PATH,
+    "-readonly",
+    "-noheader",
+    "-separator",
+    SEP,
+    "SELECT id, data FROM _plugin_storage WHERE plugin_id = 'emdash-forms' AND collection = 'forms' ORDER BY created_at ASC;",
+  ],
+  { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+);
 
-const rows = db
-  .prepare(
-    "SELECT id, data FROM _plugin_storage WHERE plugin_id = 'emdash-forms' AND collection = 'forms' ORDER BY created_at ASC",
-  )
-  .all();
-
-db.close();
+const rows = out
+  .split("\n")
+  .filter((line) => line.length > 0)
+  .map((line) => {
+    const idx = line.indexOf(SEP);
+    return { id: line.slice(0, idx), data: line.slice(idx + 1) };
+  });
 
 if (rows.length === 0) {
   console.log("No forms found in local database.");
